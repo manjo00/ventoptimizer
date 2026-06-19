@@ -31,6 +31,13 @@ git add -A && git commit -m "feat/fix/docs: <task>"
 ```
 End commit messages with: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`
 
+**☁️ Backup to GitHub — push after EVERY task.** The remote `origin` is the main backup:
+`https://github.com/manjo00/ventoptimizer.git`. After each task's final commit, immediately:
+```bash
+git push origin HEAD
+```
+Never leave a finished task with unpushed commits. If a push fails (auth or conflict), tell Ahmed in plain language and stop — do **not** force-push without asking him first.
+
 ---
 
 ## 📋 HOW A SESSION WORKS
@@ -42,7 +49,7 @@ End commit messages with: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.co
 5. **Write the task** into `docs/_Current_Task.md` using the template at the bottom of that file.
 6. **Do the work — and explain it** in plain language as you go (teaching mode).
 7. **Spotted an unrelated problem?** Note it under `## Noticed (not fixing now)` in `_Current_Task.md`. Don't fix it now.
-8. **When done, always:** append one line to `docs/_Task_History.md`, update any doc whose facts changed, and `git commit`.
+8. **When done, always:** append one line to `docs/_Task_History.md`, update any doc whose facts changed, `git commit`, then **`git push origin HEAD`** (back up to GitHub).
 
 ---
 
