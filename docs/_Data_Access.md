@@ -28,3 +28,23 @@ AI / online services. So the data stays on **your** machine; Claude only ever se
 | Error tables, distribution summaries | Anything traceable to one patient |
 
 **If ever unsure whether something is safe to paste — don't, and ask first.**
+
+---
+
+## Dataset options (scouted 2026-06-20)
+What we need: hourly ventilator settings (VT, RR, PEEP, peak/plateau pressure) + arterial blood gases, in a ventilated population.
+
+| Dataset | Size | Vent data | Access friction | Shareable w/ Claude? |
+|---|---|---|---|---|
+| **MIMIC-IV demo** | 100 patients | sparse | **None — open license, download today** | Likely yes (open ODbL license) |
+| MIMIC-IV (full) | ~tens of thousands ventilated | good | credentialed — **you already have it** | No (credentialed) |
+| AmsterdamUMCdb | 23,106 admissions | **richest respiratory** | CITI course + signed license + a **reference intensivist** (~5 days) | No |
+| HiRID | ~33k | high time-resolution | PhysioNet credentialed | No |
+| eICU | ~200k | moderate | PhysioNet credentialed | No |
+| VitalDB | ~6k | OR ventilator waveforms | open (no credentialing) | likely yes — but OR/anaesthesia (healthy lungs) → physics checks only, not ARDS |
+
+**Honest conclusion:** there is **no large, ARDS-rich, fully-open** ventilator dataset. The richer ventilation data (Amsterdam/HiRID) needs the *same or more* credentialing than MIMIC. So the smart path is two-stage:
+1. **Build + test the pipeline NOW on the open MIMIC-IV demo** (zero friction, likely shareable).
+2. **Do the real accuracy run on the full MIMIC-IV you already have** (lowest extra friction), or AmsterdamUMCdb if you want the richest respiratory data.
+
+**Caveat (true of every dataset):** measured *plateau* pressure is rarely charted (it needs an inspiratory-hold maneuver). We may validate against *peak* / driving pressure instead — the same reason your manuscript used the dynamic (peak-based) MP. Confirm by checking the dataset's column list.

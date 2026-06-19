@@ -29,3 +29,15 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 - ✅ **3τ ≈ 95% emptying** — standard math (1 − e⁻³ = 0.95).
 **Decision:** Two priorities for Track C once we have data — (1) replace linear compliance with each patient's own P–V curve; (2) improve/measure dead space. Keep MP as the objective; evaluate driving pressure (Amato 2015) as a co-limit *with data*. Every formula now traces to a citation in `_Evidence_Base.md`.
 **Commit:** Phase 1 — Track A literature pass
+
+## 2026-06-20 — Scouting lower-friction validation datasets
+**Question:** Is there a more open / lower-friction dataset than full MIMIC-IV (credentialed, unshareable with Claude)?
+**Method:** Web search of public ICU/ventilation datasets and their access models.
+**Result:**
+- **MIMIC-IV demo** (100 patients) = fully open (ODbL), downloadable now, likely shareable → ideal for BUILDING/testing the harness immediately.
+- Richer respiratory DBs (AmsterdamUMCdb 23k; HiRID; eICU) all need equal-or-greater credentialing (Amsterdam even needs a reference intensivist) → **not** lower friction.
+- VitalDB = open but OR/anaesthesia population (healthy lungs) → physics checks only.
+- **No large, ARDS-rich, fully-open ventilator dataset exists.**
+- Cross-dataset caveat: measured plateau pressure is rarely charted anywhere.
+**Decision (pending Ahmed's pick):** build + smoke-test `validate_mimic.py` on the open MIMIC-IV demo now (no waiting on credentialing); run the real accuracy validation on full MIMIC-IV (already accessible) or AmsterdamUMCdb later.
+**Commit:** Phase 1 — dataset scouting
