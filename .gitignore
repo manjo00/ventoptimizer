@@ -13,3 +13,9 @@ node_modules/
 # OS
 Thumbs.db
 .DS_Store
+
+# Patient data — NEVER commit credentialed MIMIC/PhysioNet data (governance rule)
+data/
+mimic_data/
+*.parquet
+*.csv.gz

@@ -40,6 +40,16 @@ Never leave a finished task with unpushed commits. If a push fails (auth or conf
 
 ---
 
+## 🔒 DATA GOVERNANCE — credentialed data NEVER comes to Claude
+
+When we validate against MIMIC (or any credentialed dataset):
+- **Patient data stays on the local machine. Never paste it to Claude.** PhysioNet's data-use agreement forbids sharing credentialed data with third-party AI / online services.
+- **The loop:** Claude writes the code → the **credentialed person runs it locally** → only **aggregate, de-identified results** (mean errors, counts, plots) come back to Claude.
+- **Safe to share with Claude:** column names, the data dictionary, aggregate numbers, error tables. **Never:** individual patient rows, identifiers (subject_id values, dates), raw extracts.
+- Never `git commit` patient data — keep it outside the repo (the `.gitignore` blocks common data folders). Practical checklist: `docs/_Data_Access.md`.
+
+---
+
 ## 📋 HOW A SESSION WORKS
 
 1. **Read `CLAUDE.md` + `docs/_Current_Task.md`.** That's usually all the context you need.

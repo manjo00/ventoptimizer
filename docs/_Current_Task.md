@@ -1,46 +1,31 @@
-# Current Task — Phase 1 kickoff: MIMIC shadow-testing harness
+# Current Task — Phase 1 launch: Track A (citations) + Track B setup
 
-**Date:** 2026-06-19
-**Phase:** 1 (Model accuracy & research)
-**Status:** NOT STARTED — this is the next task after setup.
+**Date:** 2026-06-20
+**Phase:** 1 (Model accuracy)
+**Status:** in progress
 
 ## Goal
-Build `engine/validate_mimic.py`: a harness that pulls real ventilated patients from MIMIC-IV and, for each, compares **what the physiology model predicts** against **what actually happened**. This tells us where the model is accurate and where it is wrong — the foundation of Phase 1.
+(A) Make every clinical number in the model defensible with a real citation — no
+data needed. (B) Set up the compliant, local-only data pipeline so we can validate
+against real MIMIC-IV patients next.
 
-## Why this first
-We cannot "accurately optimize" until we know how accurate the predictions are. Shadow testing turns vague worry ("linear compliance might be wrong") into numbers ("plateau-pressure prediction is off by X cmH₂O on average").
-
-## Files to touch (when started)
-- `engine/validate_mimic.py` — new harness (load cases → predict → compare → report error)
-- `docs/_Research_Agenda.md` — record findings as they come in
-- `docs/_Evidence_Base.md` — add any new cited numbers used
+## Files to touch
+- `docs/_Clinical_Logic.md`, `docs/_Evidence_Base.md` — resolve every `[ASSUMPTION]` with a citation/justification (Track A)
+- `docs/_Research_Log.md` — start the lab notebook with the Track A entry
+- `CLAUDE.md` — data-governance rule ✅
+- `docs/_Data_Access.md` — data checklist ✅
+- `engine/validate_mimic.py` — finalize the real-data loader (Track B, after Ahmed shares column names)
 
 ## Acceptance criteria
-- [ ] Loads a sample of ventilated patients with the fields the model needs (VT, RR, PEEP, Pplat/Ppeak, ABG)
-- [ ] Runs `physiology.predict()` on each and tabulates predicted vs observed (Pplat, MP, pH)
-- [ ] Prints a clear error summary (mean/median error per variable) **in plain language**
-- [ ] No clinical number used without a citation in `_Evidence_Base.md`
-- [ ] Git committed
-
-## Open question to resolve with Ahmed before coding
-- Which dataset for shadow testing — the same **MIMIC-IV** derived respiratory dataset from the manuscript, or the **MIMIC-III** the mega-prompt mentioned? (Recommend MIMIC-IV: you already have access + the pipeline experience.)
+- [ ] Every `[ASSUMPTION]` tag in `_Clinical_Logic.md` is cited or explicitly justified
+- [ ] Data-governance rule in `CLAUDE.md` + `_Data_Access.md` checklist ✅
+- [ ] Research log started with the Track A entry
+- [ ] No clinical number without a citation
+- [ ] Committed + pushed
 
 ## Noticed (not fixing now)
 - (none yet)
 
----
-### Template — copy this block to start any new task
-```markdown
-# Current Task — <short name>
-**Date:** <today>   **Phase:** <n>   **Status:** in progress
-## Goal
-<Ahmed's request, restated plainly>
-## Files to touch
-- `<file>` — <what & why>
-## Acceptance criteria
-- [ ] <proof it works>
-- [ ] No uncited clinical numbers
-- [ ] Git committed
-## Noticed (not fixing now)
-<unrelated issues spotted>
-```
+## Open with Ahmed (Track B — when ready)
+- Who is credentialed on PhysioNet? (that person runs the data steps)
+- Then: paste the dataset's **column names** so I can finalize `validate_mimic.py`.

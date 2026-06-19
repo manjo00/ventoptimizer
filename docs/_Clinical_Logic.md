@@ -13,18 +13,18 @@ MP = 0.098 × RR × VT(litres) × [ Ppeak − ½ × (Ppeak − PEEP) ]
 - **Why VT matters more than RR:** raising VT raises both the volume *and* the pressure term, so its effect on power is roughly **squared**; RR enters only **linearly**. → the optimizer naturally prefers **smaller breaths, faster rate**.
 - Caveat `[E2]`: peak pressure includes airway *resistance*, so in stiff-airway patients MP can be over-estimated vs a plateau-based version.
 
-## 2. Lung compliance — how stretchy the lung is  `[ASSUMPTION] [TO-RESEARCH]`
+## 2. Lung compliance — how stretchy the lung is  `[ASSUMPTION → known wrong, N2]`
 ```
 Static compliance  C = VT ÷ (Pplat − PEEP)        (mL per cmH₂O)
 ```
-- We assume compliance is **constant (linear)** across pressures. Real lungs are **not** linear — they have inflection points (too-low or too-high pressure both stiffen them).
-- **This is the model's biggest known weakness.** Phase 1 must quantify how wrong "linear" is. `[E3]`
+- We assume compliance is **constant (linear)** across pressures. The ARDS pressure–volume curve is **not** linear — it has a lower and an upper inflection point `[N2]`, so compliance changes with pressure and recruitment.
+- **This is the model's biggest known weakness.** Track C will measure the error and replace "linear" with each patient's own P–V curve. (Research Agenda Q1.)
 
-## 3. Recruitment — does adding PEEP help or hurt?  `[ASSUMPTION] [TO-RESEARCH]`
+## 3. Recruitment — does adding PEEP help or hurt?  `[concept cited N1; formula ASSUMPTION]`
 Uses the Recruitment-to-Inflation (R/I) index:
 - **R/I > 0.5 (recruitable):** raising PEEP opens collapsed lung → compliance improves → driving pressure and MP can *fall*.
 - **R/I < 0.5 (non-recruitable):** raising PEEP overstretches → compliance worsens → MP *rises*.
-- Current math: `C_new = C × (1 + (R/I − 0.5) × 0.1 × ΔPEEP)`. **The `0.1` multiplier is invented — no citation.** `[E4]` covers the R/I concept; the formula itself is `[ASSUMPTION]`.
+- Current math: `C_new = C × (1 + (R/I − 0.5) × 0.1 × ΔPEEP)`. The **R/I concept and the 0.5 cut-off are cited** `[N1]` (Chen 2020); **the `×0.1` multiplier is invented** — no source — so the formula stays `[ASSUMPTION]` and is a Track-C replace-target.
 
 ## 4. Auto-PEEP / breath-stacking guard  `[STANDARD] [E5]`
 A lung empties on an exponential curve with time constant `τ = Resistance × Compliance`. It takes ~3 time constants to empty 95%.
@@ -42,12 +42,12 @@ Protects obstructive/COPD patients from breath-stacking. The "1.0 s inspiration"
 ## 6. Gas exchange & pH — don't suffocate the patient  `[STANDARD] [E6]`
 CO₂ is cleared by *alveolar* ventilation (total breath minus wasted "dead space"):
 ```
-Dead space ≈ 2.2 mL × PBW(kg)            [ASSUMPTION — rough]
+Dead space ≈ 2.2 mL × PBW(kg)            [rough convention: Radford N3a; weakly validated N3b]
 Alveolar ventilation Va = RR × (VT − dead space)
 Predicted CO₂  = (baseline Va × baseline CO₂) ÷ new Va     (inverse rule)
 Predicted pH   = 6.1 + log10( HCO₃ ÷ (0.03 × CO₂) )        (Henderson–Hasselbalch)
 ```
-- **Permissive hypercapnia:** to save more power we let CO₂ rise, but only down to a pH floor (7.30 standard, 7.20 permissive). The exact floor needs a proper citation `[TO-RESEARCH]`.
+- **Permissive hypercapnia:** we let CO₂ rise but only to a pH floor (7.30 standard, 7.20 permissive) — ARDSNet-aligned pragmatic conventions `[E3, E6]`; ~7.20 is the widely accepted (if somewhat arbitrary) lower bound.
 
 ## 7. The baseline plateau pressure is mandatory  `[STANDARD]`
 Everything keys off the measured `Pplat` (via an inspiratory hold) because that's what gives the starting compliance `C`. Without it, the model has no anchor and cannot predict.
