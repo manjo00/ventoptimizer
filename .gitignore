@@ -1,0 +1,15 @@
+# Office lock files
+~$*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node (from earlier doc tooling)
+node_modules/
+
+# OS
+Thumbs.db
+.DS_Store

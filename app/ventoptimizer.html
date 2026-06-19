@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VentOptimizer (prototype)</title>
+<!--
+  Bedside DEMO. The trusted model lives in engine/*.py — this page mirrors it.
+  Self-contained (no internet needed): just open this file in a browser.
+  Logic faithfully ported from the v2.4 prototype in reference/Mega-Prompt Context.md.
+-->
+<style>
+  :root{ --bg:#f3f4f6; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+         --blue:#2563eb; --green:#10b981; --amber:#f59e0b; --red:#ef4444; }
+  *{box-sizing:border-box} body{font-family:"Segoe UI",system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:16px}
+  .wrap{max-width:480px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 4px} .sub{color:var(--muted);font-size:12px;margin:0 0 14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  h2{font-size:14px;margin:0 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+  input[type=number]{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .mode{display:flex;gap:8px;margin-bottom:10px}
+  .mode button{flex:1;padding:9px;border:1px solid var(--line);border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;background:#fff;color:var(--muted)}
+  .mode button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .chk{display:flex;align-items:center;gap:8px;background:#eff6ff;border:1px solid #dbeafe;border-radius:8px;padding:8px;font-size:12px}
+  .go{width:100%;background:var(--blue);color:#fff;font-weight:700;border:0;border-radius:10px;padding:12px;font-size:15px;cursor:pointer}
+  .res{border-left:6px solid var(--green)} .res.warn{border-left-color:var(--amber)} .res.bad{border-left-color:var(--red)}
+  .big{font-size:22px;font-weight:800} .mp{font-size:20px;font-weight:800;font-family:ui-monospace,monospace}
+  .row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+  .muted{color:var(--muted);font-size:12px} .hide{display:none}
+  .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:8px;padding:8px;font-size:11px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>VentOptimizer <span class="muted">prototype</span></h1>
+  <p class="sub">Suggests the lowest-Mechanical-Power safe setting. Decision-support — a clinician reviews every suggestion.</p>
+
+  <div class="card">
+    <h2>1 · Mode &amp; strategy</h2>
+    <div class="mode">
+      <button id="btnVC" class="on" onclick="setMode('VC')">Volume (VC)</button>
+      <button id="btnPC" onclick="setMode('PC')">Pressure (PC)</button>
+    </div>
+    <div class="grid">
+      <div><label>R/I index (0–1)</label><input type="number" id="ri" value="0.8" step="0.1"></div>
+      <div class="chk"><input type="checkbox" id="permissive" checked><label style="margin:0;text-transform:none;letter-spacing:0;color:var(--ink)"><b>Permissive CO₂</b> (pH ≥ 7.20)</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2 · Patient &amp; baseline</h2>
+    <div class="grid">
+      <div><label>PBW (kg)</label><input type="number" id="pbw" value="70"></div>
+      <div><label>Base PaCO₂</label><input type="number" id="paco2" value="70"></div>
+      <div><label>HCO₃</label><input type="number" id="hco3" value="24"></div>
+      <div><label>PF ratio</label><input type="number" id="pf" value="140"></div>
+    </div>
+    <p class="muted" style="margin:10px 0 6px;text-align:center">Observed baseline settings (plateau via inspiratory hold)</p>
+    <div class="grid3">
+      <div><label>VT</label><input type="number" id="bvt" value="430"></div>
+      <div><label>RR</label><input type="number" id="brr" value="20"></div>
+      <div><label>PEEP</label><input type="number" id="bpeep" value="5"></div>
+      <div><label>Pplat</label><input type="number" id="bpplat" value="25"></div>
+      <div><label>Ppeak</label><input type="number" id="bppeak" value="30"></div>
+    </div>
+  </div>
+
+  <button class="go" onclick="runOptimizer()">Optimize settings</button>
+
+  <div id="out" class="card res hide" style="margin-top:14px">
+    <div class="row"><span class="muted" id="label">OPTIMAL SETTING</span></div>
+    <div class="big" id="rec">—</div>
+    <div class="row"><span>Mechanical Power</span><span><span class="mp" id="mp">—</span> J/min</span></div>
+    <div class="row"><span class="muted">vs baseline</span><span class="muted" id="cmp">—</span></div>
+    <div class="row"><span>Predicted pH</span><span id="ph">—</span></div>
+    <div class="row"><span>Driving pressure</span><span id="dp">—</span></div>
+    <div class="muted" id="logic" style="margin-top:8px"></div>
+    <div class="note">Suggestion only — a clinician must review before any change.</div>
+  </div>
+</div>
+
+<script>
+let MODE = 'VC';
+function setMode(m){ MODE=m;
+  btnVC.className = m==='VC'?'on':''; btnPC.className = m==='PC'?'on':''; }
+const v = id => parseFloat(document.getElementById(id).value);
+
+function runOptimizer(){
+  const pt = { pbw:v('pbw'), pf:v('pf'), ri:v('ri'), paco2:v('paco2'), hco3:v('hco3'),
+               permissive: document.getElementById('permissive').checked };
+  const base = { vt:v('bvt'), rr:v('brr'), peep:v('bpeep'), pplat:v('bpplat'), ppeak:v('bppeak') };
+  const L = { min_ph: pt.permissive?7.20:7.30, max_pplat:30, max_vt_kg:8, min_vt_kg:4 };
+
+  // baseline mechanics
+  const DP = base.pplat - base.peep;
+  const C0 = DP>0 ? base.vt/DP : 50;
+  const gap = base.ppeak - base.pplat;
+  const Raw = gap / (base.vt/1000);
+  const Vd = 2.2*pt.pbw;
+  const Va0 = base.rr*(base.vt - Vd);
+  const baseMP = 0.098*base.rr*(base.vt/1000)*(base.ppeak - 0.5*DP);
+  const recruitable = pt.ri>0.5, hypoxic = pt.pf<150;
+
+  const RRs=[15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+  const PEEPs=[5,8,10,12,14,16];
+  const primary = MODE==='VC' ? [350,380,400,420,450,480] : [15,18,20,22,24,26,28,30];
+
+  let bestScore=Infinity, bestSet=null, bestP=null;
+  for(const val of primary) for(const rr of RRs) for(const peep of PEEPs){
+    let C=C0, dPeep=peep-base.peep;
+    if(dPeep>0) C = C0*(1 + (pt.ri-0.5)*0.1*dPeep);   // recruitment [ASSUMPTION]
+    let vt, pinsp;
+    if(MODE==='VC'){ vt=val; pinsp=peep + vt/C; } else { pinsp=val; vt=(pinsp-peep)*C; }
+    const pplat=pinsp, drive=pplat-peep, ppeak=pplat+gap;
+    const term = MODE==='VC'?ppeak:pplat;
+    const mp = 0.098*rr*(vt/1000)*(term - 0.5*drive);
+    const Va = rr*(vt - Vd);
+    const paco2 = (Va0*pt.paco2)/Va;
+    const ph = 6.1 + Math.log10(pt.hco3/(0.03*paco2));
+    const tau = Raw*(C/1000), te = 60/rr - 1.0;
+
+    if(pplat>L.max_pplat) continue;
+    if(vt/pt.pbw>L.max_vt_kg || vt/pt.pbw<L.min_vt_kg) continue;
+    if(ph<L.min_ph) continue;
+    if(te<3*tau) continue;
+    if(!recruitable && peep>base.peep) continue;
+    if(recruitable && hypoxic && peep<base.peep) continue;
+
+    const dev = MODE==='VC' ? Math.abs(vt-base.vt)*0.01 : Math.abs(pinsp-base.pplat)*0.5;
+    const score = mp + dev + Math.abs(rr-base.rr)*0.5 + Math.abs(peep-base.peep)*1.0;
+    if(score<bestScore){ bestScore=score; bestSet={vt,rr,peep,pinsp}; bestP={mp,ph,pplat,drive}; }
+  }
+
+  const out=document.getElementById('out'); out.classList.remove('hide');
+  if(!bestSet){ out.className='card res bad'; label.textContent='NO SAFE SETTING FOUND';
+    rec.textContent='Review manually'; mp.textContent='—'; cmp.textContent='—'; ph.textContent='—'; dp.textContent='—';
+    logic.textContent='Could not satisfy plateau / tidal-volume / pH / air-trapping limits.'; return; }
+
+  out.className = 'card res' + (bestP.mp>25?' warn':'');
+  label.textContent = bestP.mp>25 ? 'WARNING: HIGH POWER' : 'OPTIMAL SETTING';
+  rec.textContent = MODE==='VC' ? `VT ${Math.round(bestSet.vt)} · RR ${bestSet.rr} · PEEP ${bestSet.peep}`
+                                : `Pinsp ${Math.round(bestSet.pinsp)} · RR ${bestSet.rr} · PEEP ${bestSet.peep}`;
+  mp.textContent = bestP.mp.toFixed(1);
+  const saved = baseMP - bestP.mp, pct = baseMP? Math.abs(saved/baseMP*100):0;
+  cmp.textContent = `${baseMP.toFixed(1)} → ${(saved>=0?'▼':'▲')} ${Math.abs(saved).toFixed(1)} (${pct.toFixed(0)}%)`;
+  ph.textContent = bestP.ph.toFixed(2);
+  dp.textContent = bestP.drive.toFixed(0) + ' cmH₂O';
+  logic.textContent = `${recruitable?'Recruitable':'Non-recruitable'} lung logic · pH floor ${L.min_ph.toFixed(2)} · mode ${MODE}.`;
+}
+</script>
+</body>
+</html>
