@@ -17,6 +17,7 @@
 - **We assume:** `C_new = C × (1 + (R/I − 0.5)×0.1×ΔPEEP)` — the `0.1` is invented.
 - **Test:** find cases with PEEP changes; see whether compliance actually moved the way the formula predicts.
 - **Fix if wrong:** replace the heuristic with a data-derived or published relationship; cite it.
+- **MEASURED (demo, 2026-06-20):** plateau-prediction error concentrates in PEEP changes — **MAE 4.80 cmH₂O for PEEP changes vs 2.68 for VT-only.** Recruitment is real and the current model ignores it when PEEP moves. → now the #1 Track-C fix (was Q1). Next: characterize compliance-vs-PEEP from data.
 
 ### Q3 — Are the CO₂ / pH predictions accurate?
 - **We assume:** dead space = 2.2 mL/kg; CO₂ scales inversely with alveolar ventilation.

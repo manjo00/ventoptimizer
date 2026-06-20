@@ -50,3 +50,12 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 - **Exp 2 — plateau prediction after a settings change** (1,056 paired changes): **MAE 3.05 cmH₂O**, bias +0.51, within 2 cmH₂O 51.8%, within 5 cmH₂O 83.9%.
 **Decision:** Baseline established. Plateau MAE 3.05 is above our provisional ≤2 target, and the ~19% compliance drift is the likely cause. **Track C target #1 = replace constant compliance with a per-patient/updated compliance, then re-measure (goal: cut the MAE).** Demo numbers are indicative; Ahmed re-runs on full MIMIC-IV later.
 **Commit:** Phase 1 — first demo shadow test
+
+## 2026-06-20 — Track C attempt #1: robust compliance + diagnostic split
+**Question:** Can a noise-robust compliance (median of recent readings) cut the plateau-prediction error below the 3.05 baseline? And where does the error actually come from?
+**Method:** Added an "improved" predictor (median of last 5 compliance readings) alongside the baseline (single last reading); also split the baseline error by whether PEEP changed. Same demo cohort (1,056 setting-changes).
+**Result (aggregate):**
+- Robust compliance did **NOT** help: MAE **3.07** vs **3.05** baseline (−0.9%, marginally worse) → the error is **not random noise**.
+- **Diagnostic split (the key finding):** VT-only changes (n=873) MAE **2.68**; PEEP changes (n=183) MAE **4.80** — nearly double.
+**Decision:** Smoothing rejected. The error concentrates in PEEP changes → it's a **recruitment effect** (compliance measured at the old PEEP doesn't hold at the new PEEP). This is Research Agenda Q2. **Next: measure how compliance actually changes with PEEP from the data, then build a PEEP-aware (recruitment) compliance — not smoothing.**
+**Commit:** Phase 1 — Track C attempt #1 (compliance)

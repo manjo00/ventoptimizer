@@ -95,27 +95,43 @@ def exp1_compliance_stability(d):
     }
 
 
-def exp2_plateau_prediction(d):
-    """When VT or PEEP changed, predict the new plateau from the previous compliance."""
-    errors = []
+def exp2_plateau_prediction(d, k=5):
+    """When VT or PEEP changed, predict the new plateau pressure two ways and compare:
+       BASELINE  — use the single most recent compliance reading.
+       IMPROVED  — use the MEDIAN of the patient's last k compliance readings
+                   (robust to one-off noisy readings).
+       Also splits the baseline error by whether PEEP changed (a recruitment confound:
+       compliance measured at the old PEEP may not hold at the new PEEP)."""
+    err_base, err_improved, peep_changed = [], [], []
     for _, g in d.groupby("stay_id"):
         g = g.sort_values("charttime").reset_index(drop=True)
+        comp = g["compliance"].to_numpy()
+        vt = g["vt"].to_numpy()
+        peep = g["peep"].to_numpy()
+        pplat = g["pplat"].to_numpy()
         for i in range(1, len(g)):
-            prev, cur = g.iloc[i - 1], g.iloc[i]
-            changed = abs(cur["vt"] - prev["vt"]) >= 10 or abs(cur["peep"] - prev["peep"]) >= 1
-            if not changed:
+            if not (abs(vt[i] - vt[i - 1]) >= 10 or abs(peep[i] - peep[i - 1]) >= 1):
                 continue
-            predicted_pplat = cur["peep"] + cur["vt"] / prev["compliance"]   # model's prediction
-            errors.append(predicted_pplat - cur["pplat"])                    # minus reality
-    e = np.array(errors)
-    if e.size == 0:
+            c_last = comp[i - 1]                       # baseline: last single reading
+            c_robust = float(np.median(comp[max(0, i - k):i]))  # improved: median of last k
+            err_base.append(peep[i] + vt[i] / c_last - pplat[i])
+            err_improved.append(peep[i] + vt[i] / c_robust - pplat[i])
+            peep_changed.append(abs(peep[i] - peep[i - 1]) >= 1)
+
+    eb, ei, pc = np.array(err_base), np.array(err_improved), np.array(peep_changed)
+    if eb.size == 0:
         return {"paired_setting_changes": 0}
+    mae = lambda x: round(float(np.mean(np.abs(x))), 2) if x.size else None
     return {
-        "paired_setting_changes": int(e.size),
-        "mean_abs_error_cmH2O": round(float(np.mean(np.abs(e))), 2),
-        "bias_cmH2O": round(float(np.mean(e)), 2),
-        "within_2_cmH2O_pct": round(float(np.mean(np.abs(e) <= 2) * 100), 1),
-        "within_5_cmH2O_pct": round(float(np.mean(np.abs(e) <= 5) * 100), 1),
+        "paired_setting_changes": int(eb.size),
+        "baseline_MAE_cmH2O (last reading)": mae(eb),
+        f"improved_MAE_cmH2O (median of last {k})": mae(ei),
+        "improvement_pct": round(float((np.mean(np.abs(eb)) - np.mean(np.abs(ei)))
+                                       / np.mean(np.abs(eb)) * 100), 1),
+        "within_2_cmH2O_pct (improved)": round(float(np.mean(np.abs(ei) <= 2) * 100), 1),
+        "—diagnostic split (baseline)—": "",
+        "VT-only changes: n / MAE": f"{int((~pc).sum())} / {mae(eb[~pc])}",
+        "PEEP changes:    n / MAE": f"{int(pc.sum())} / {mae(eb[pc])}",
     }
 
 
@@ -135,10 +151,11 @@ def main():
         print(f"   {k}: {v}")
     print("   → higher variation = the linear-compliance assumption is weaker.\n")
 
-    print("Experiment 2 — plateau-pressure prediction after a settings change")
+    print("Experiment 2 — plateau prediction: baseline vs improved compliance")
     for k, v in exp2_plateau_prediction(d).items():
         print(f"   {k}: {v}")
-    print("   → mean_abs_error is how far off the model's predicted plateau is, in cmH2O.")
+    print("   → lower MAE = better. 'improvement_pct' is how much the robust")
+    print("     compliance beat the single-last-reading baseline.")
 
 
 if __name__ == "__main__":

@@ -10,9 +10,13 @@
 - **Demo harness ✅** — `engine/validate_mimic.py` runs on the open MIMIC-IV demo (100 patients).
 - **First real result (demo):** within-patient compliance varies ~19% (median); plateau-prediction **MAE 3.05 cmH₂O** (target ≤ 2). Logged in `docs/_Research_Log.md`.
 
-## Next (Track C — beat the baseline)
-- Replace the **constant** compliance with a **per-patient / recently-updated** compliance (use the patient's own recent VT–Pplat points), re-run the harness → does the plateau MAE drop below 3.05?
-- Then add a pH/CO₂ prediction experiment and revisit dead space.
+## Track C attempt #1 result (2026-06-20)
+- Robust/smoothed compliance did **NOT** help (3.07 vs 3.05). The error is not noise.
+- **Diagnostic:** VT-only changes MAE **2.68**; PEEP changes MAE **4.80** → the error is a **recruitment** effect (compliance shifts when PEEP moves).
+
+## Next (Track C #2 — the real fix)
+- Measure compliance-vs-PEEP from the data; build a **PEEP-aware (recruitment) compliance**; re-run → does the PEEP-change MAE drop?
+- Then a pH/CO₂ prediction experiment + revisit dead space.
 
 ## Open with Ahmed
 - When we reach a good point, **you** run `validate_mimic.py` on the **full MIMIC-IV** locally and paste back the aggregate numbers (governance rule).
