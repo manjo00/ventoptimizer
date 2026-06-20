@@ -74,6 +74,7 @@ The whole point of this setup is to NOT re-read everything. Match the task to th
 | The physiology / equations / "why" | `docs/_Clinical_Logic.md` |
 | The research evidence / a clinical number | `docs/_Evidence_Base.md` |
 | Data shapes (inputs/outputs/limits) | `docs/_Schema.md` |
+| The MIMIC data field codes (itemids) | `docs/_Data_Dictionary.md` |
 | How pieces connect | `docs/_Architecture.md` |
 | What to do next / open questions | `docs/_Research_Agenda.md` + `Roadmap.md` |
 | The Python engine code | `engine/README.md`, then the one `.py` file named |

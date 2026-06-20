@@ -47,4 +47,4 @@ What we need: hourly ventilator settings (VT, RR, PEEP, peak/plateau pressure) +
 1. **Build + test the pipeline NOW on the open MIMIC-IV demo** (zero friction, likely shareable).
 2. **Do the real accuracy run on the full MIMIC-IV you already have** (lowest extra friction), or AmsterdamUMCdb if you want the richest respiratory data.
 
-**Caveat (true of every dataset):** measured *plateau* pressure is rarely charted (it needs an inspiratory-hold maneuver). We may validate against *peak* / driving pressure instead — the same reason your manuscript used the dynamic (peak-based) MP. Confirm by checking the dataset's column list.
+**Caveat (true of every dataset):** measured *plateau* pressure is rarely charted (it needs an inspiratory-hold maneuver). We may validate against *peak* / driving pressure instead — the same reason your manuscript used the dynamic (peak-based) MP. Confirm by checking the dataset's column list. (Field codes we use → `docs/_Data_Dictionary.md`.)
