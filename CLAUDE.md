@@ -3,6 +3,8 @@
 
 VentOptimizer recommends mechanical-ventilator settings (tidal volume, respiratory rate, PEEP, inspiratory pressure) that **minimize Mechanical Power** — the energy delivered to the lungs each minute — while staying inside hard safety limits, to reduce Ventilator-Induced Lung Injury (VILI). It is a **decision-support prototype, not a medical device.**
 
+It targets **all mechanically ventilated patients — not just ARDS.** Excess mechanical power harms the whole ventilated population (the manuscript's MP–mortality link held across every subgroup, none spared), so the tool and its validation are not ARDS-specific.
+
 The evidence that minimizing Mechanical Power is the right goal comes from Ahmed's own MIMIC-IV study: each +1 J/min of power raised the adjusted odds of 28-day death by ~9%, with risk rising steadily and **no safe threshold even below 17 J/min** (see `docs/_Evidence_Base.md`).
 
 ---

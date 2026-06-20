@@ -41,3 +41,12 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 - Cross-dataset caveat: measured plateau pressure is rarely charted anywhere.
 **Decision (pending Ahmed's pick):** build + smoke-test `validate_mimic.py` on the open MIMIC-IV demo now (no waiting on credentialing); run the real accuracy validation on full MIMIC-IV (already accessible) or AmsterdamUMCdb later.
 **Commit:** Phase 1 — dataset scouting
+
+## 2026-06-20 — First shadow test on the open MIMIC-IV demo (BASELINE accuracy)
+**Question:** How accurate is the current model's physiology on real ventilated patients?
+**Method:** Built `engine/validate_mimic.py` (aggregate-only); ran on the open MIMIC-IV demo. Cohort = ventilated snapshots with VT + PEEP + Pplat present = **8,480 snapshots, 56 patients**. Two experiments.
+**Result (aggregate only):**
+- **Exp 1 — compliance stability:** within-patient compliance varies a **median 19.2%** (mean 21.0%) over each patient's course → the constant/linear-compliance assumption is meaningfully wrong (confirms Research Agenda Q1).
+- **Exp 2 — plateau prediction after a settings change** (1,056 paired changes): **MAE 3.05 cmH₂O**, bias +0.51, within 2 cmH₂O 51.8%, within 5 cmH₂O 83.9%.
+**Decision:** Baseline established. Plateau MAE 3.05 is above our provisional ≤2 target, and the ~19% compliance drift is the likely cause. **Track C target #1 = replace constant compliance with a per-patient/updated compliance, then re-measure (goal: cut the MAE).** Demo numbers are indicative; Ahmed re-runs on full MIMIC-IV later.
+**Commit:** Phase 1 — first demo shadow test

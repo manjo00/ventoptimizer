@@ -43,7 +43,7 @@ What we need: hourly ventilator settings (VT, RR, PEEP, peak/plateau pressure) +
 | eICU | ~200k | moderate | PhysioNet credentialed | No |
 | VitalDB | ~6k | OR ventilator waveforms | open (no credentialing) | likely yes — but OR/anaesthesia (healthy lungs) → physics checks only, not ARDS |
 
-**Honest conclusion:** there is **no large, ARDS-rich, fully-open** ventilator dataset. The richer ventilation data (Amsterdam/HiRID) needs the *same or more* credentialing than MIMIC. So the smart path is two-stage:
+**Honest conclusion:** there is **no large, ARDS-rich, fully-open** ventilator dataset — but we **don't need ARDS-rich data**: the model targets *all* ventilated patients, so a general ventilated cohort (MIMIC or its open demo) is perfectly suitable. The richer respiratory DBs (Amsterdam/HiRID) need the *same or more* credentialing than MIMIC anyway. So the smart path is two-stage:
 1. **Build + test the pipeline NOW on the open MIMIC-IV demo** (zero friction, likely shareable).
 2. **Do the real accuracy run on the full MIMIC-IV you already have** (lowest extra friction), or AmsterdamUMCdb if you want the richest respiratory data.
 

@@ -1,31 +1,21 @@
-# Current Task — Phase 1 launch: Track A (citations) + Track B setup
+# Current Task — Phase 1: improve compliance (Track C)
 
 **Date:** 2026-06-20
 **Phase:** 1 (Model accuracy)
-**Status:** in progress
+**Status:** baseline done; Track C next
 
-## Goal
-(A) Make every clinical number in the model defensible with a real citation — no
-data needed. (B) Set up the compliant, local-only data pipeline so we can validate
-against real MIMIC-IV patients next.
+## Done this session
+- **Track A ✅** — every clinical number now cited (`docs/_Evidence_Base.md`).
+- **Data governance ✅** — rule in `CLAUDE.md` + `docs/_Data_Access.md`.
+- **Demo harness ✅** — `engine/validate_mimic.py` runs on the open MIMIC-IV demo (100 patients).
+- **First real result (demo):** within-patient compliance varies ~19% (median); plateau-prediction **MAE 3.05 cmH₂O** (target ≤ 2). Logged in `docs/_Research_Log.md`.
 
-## Files to touch
-- `docs/_Clinical_Logic.md`, `docs/_Evidence_Base.md` — resolve every `[ASSUMPTION]` with a citation/justification (Track A)
-- `docs/_Research_Log.md` — start the lab notebook with the Track A entry
-- `CLAUDE.md` — data-governance rule ✅
-- `docs/_Data_Access.md` — data checklist ✅
-- `engine/validate_mimic.py` — finalize the real-data loader (Track B, after Ahmed shares column names)
+## Next (Track C — beat the baseline)
+- Replace the **constant** compliance with a **per-patient / recently-updated** compliance (use the patient's own recent VT–Pplat points), re-run the harness → does the plateau MAE drop below 3.05?
+- Then add a pH/CO₂ prediction experiment and revisit dead space.
 
-## Acceptance criteria
-- [ ] Every `[ASSUMPTION]` tag in `_Clinical_Logic.md` is cited or explicitly justified
-- [ ] Data-governance rule in `CLAUDE.md` + `_Data_Access.md` checklist ✅
-- [ ] Research log started with the Track A entry
-- [ ] No clinical number without a citation
-- [ ] Committed + pushed
+## Open with Ahmed
+- When we reach a good point, **you** run `validate_mimic.py` on the **full MIMIC-IV** locally and paste back the aggregate numbers (governance rule).
 
 ## Noticed (not fixing now)
-- (none yet)
-
-## Open with Ahmed (Track B — when ready)
-- Who is credentialed on PhysioNet? (that person runs the data steps)
-- Then: paste the dataset's **column names** so I can finalize `validate_mimic.py`.
+- (none)

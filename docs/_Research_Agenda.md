@@ -11,6 +11,7 @@
 - **Why it may be wrong:** real pressure–volume curves bend (lower/upper inflection points); a single line can mis-predict plateau pressure and therefore MP.
 - **Test:** on MIMIC cases, compare predicted Pplat (from baseline compliance) vs actually-charted Pplat at different settings. Measure the error.
 - **Fix if wrong:** piecewise/nonlinear compliance from the patient's own data points.
+- **MEASURED (demo, 2026-06-20):** within-patient compliance varies **~19% median**; plateau-prediction **MAE 3.05 cmH₂O** (1,056 changes). → confirmed weak; Track-C fix #1.
 
 ### Q2 — Is the recruitment formula defensible?
 - **We assume:** `C_new = C × (1 + (R/I − 0.5)×0.1×ΔPEEP)` — the `0.1` is invented.
