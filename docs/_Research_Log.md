@@ -59,3 +59,13 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 - **Diagnostic split (the key finding):** VT-only changes (n=873) MAE **2.68**; PEEP changes (n=183) MAE **4.80** — nearly double.
 **Decision:** Smoothing rejected. The error concentrates in PEEP changes → it's a **recruitment effect** (compliance measured at the old PEEP doesn't hold at the new PEEP). This is Research Agenda Q2. **Next: measure how compliance actually changes with PEEP from the data, then build a PEEP-aware (recruitment) compliance — not smoothing.**
 **Commit:** Phase 1 — Track C attempt #1 (compliance)
+
+## 2026-06-20 — Track C attempt #2: PEEP-aware (recruitment) compliance — ✅ WORKS
+**Question:** Does a data-learned PEEP-aware compliance cut the PEEP-change error (baseline 4.8)?
+**Method:** From the demo PEEP-change events (n=183) measured how compliance moves with PEEP. Then an HONEST train/test: learned a recruitment slope β on even-id patients, scored the corrected prediction `C×(1+β·ΔPEEP)` on held-out odd-id patients (73 events) — so the model never grades its own homework.
+**Result (aggregate):**
+- Recruitment is real & sizable: compliance **+40% median when PEEP goes UP**, **−23% when PEEP goes DOWN**.
+- Learned slope **β = 0.083 per cmH₂O** — strikingly close to the prototype's *guessed* ×0.1 (original instinct was about right; now data-grounded, and works WITHOUT needing R/I).
+- Held-out test: baseline MAE 4.48 → **PEEP-aware MAE 3.21 = 28.3% improvement.**
+**Decision:** First validated model improvement. Caveat: small demo (73 test events) → **Ahmed confirms on full MIMIC-IV before we change the production model** (`physiology.py`) in Phase 2. Per-patient R/I could refine β further later.
+**Commit:** Phase 1 — Track C #2 (PEEP-aware compliance) validated

@@ -25,7 +25,8 @@ MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
 ## Recruitment-to-Inflation (R/I) index  `[N1]` — concept & 0.5 threshold now CITED
 - `[N1]` Chen L, Del Sorbo L, Grieco DL, et al. *Potential for Lung Recruitment Estimated by the Recruitment-to-Inflation Ratio in ARDS. A Clinical Trial.* Am J Respir Crit Care Med 2020;201(2):178–187.
 - The **R/I = 0.5 cut-off** (the cohort median) separates **low (≤0.5)** vs **high (>0.5)** recruitability. → our >0.5 "recruitable" rule is grounded.
-- ⚠️ **Still an `[ASSUMPTION]`:** our compliance formula `C_new = C × (1 + (R/I−0.5)×0.1×ΔPEEP)`. The `×0.1` is invented — Chen gives no PEEP→compliance equation. **Phase-1 Track C replace-target.**
+- ⚠️ **Was an `[ASSUMPTION]`:** our compliance formula `C_new = C × (1 + (R/I−0.5)×0.1×ΔPEEP)`. The `×0.1` was invented — Chen gives no PEEP→compliance equation.
+- **DATA UPDATE (demo, 2026-06-20):** measured a population recruitment slope **β ≈ 0.083 per cmH₂O** (compliance +40% when PEEP↑, −23% when PEEP↓); a `C×(1+β·ΔPEEP)` correction cut PEEP-change plateau error **28%** on held-out patients. So the `×0.1` magnitude is **data-supported (ballpark-correct)**, not arbitrary — confirm on full MIMIC-IV before changing production. See `_Research_Log`.
 
 ## Lung compliance is NONLINEAR (the model's biggest weakness)  `[N2]`
 - The ARDS pressure–volume curve has **three segments** with a **lower** and an **upper inflection point**; compliance changes with pressure/recruitment — it is **not a single constant**. `[N2]` Hickling KG. *The pressure–volume curve is greatly modified by recruitment. A mathematical model of ARDS lungs.* Am J Respir Crit Care Med 1998;158(1):194–202 (plus the inflection-point P–V literature).

@@ -20,11 +20,11 @@ Static compliance  C = VT ÷ (Pplat − PEEP)        (mL per cmH₂O)
 - We assume compliance is **constant (linear)** across pressures. The ARDS pressure–volume curve is **not** linear — it has a lower and an upper inflection point `[N2]`, so compliance changes with pressure and recruitment.
 - **This is the model's biggest known weakness.** Track C will measure the error and replace "linear" with each patient's own P–V curve. (Research Agenda Q1.)
 
-## 3. Recruitment — does adding PEEP help or hurt?  `[concept cited N1; formula ASSUMPTION]`
+## 3. Recruitment — does adding PEEP help or hurt?  `[concept cited N1; magnitude data-supported]`
 Uses the Recruitment-to-Inflation (R/I) index:
 - **R/I > 0.5 (recruitable):** raising PEEP opens collapsed lung → compliance improves → driving pressure and MP can *fall*.
 - **R/I < 0.5 (non-recruitable):** raising PEEP overstretches → compliance worsens → MP *rises*.
-- Current math: `C_new = C × (1 + (R/I − 0.5) × 0.1 × ΔPEEP)`. The **R/I concept and the 0.5 cut-off are cited** `[N1]` (Chen 2020); **the `×0.1` multiplier is invented** — no source — so the formula stays `[ASSUMPTION]` and is a Track-C replace-target.
+- Current math: `C_new = C × (1 + (R/I − 0.5) × 0.1 × ΔPEEP)`. The **R/I concept and the 0.5 cut-off are cited** `[N1]` (Chen 2020). The `×0.1` magnitude is now **data-supported**: the demo shows a population recruitment slope **β ≈ 0.083/cmH₂O**, and a PEEP-aware correction cut plateau error **28%** on held-out patients (see `_Research_Log`). Confirm on full MIMIC-IV before changing the production model.
 
 ## 4. Auto-PEEP / breath-stacking guard  `[STANDARD] [E5]`
 A lung empties on an exponential curve with time constant `τ = Resistance × Compliance`. It takes ~3 time constants to empty 95%.

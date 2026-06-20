@@ -14,9 +14,15 @@
 - Robust/smoothed compliance did **NOT** help (3.07 vs 3.05). The error is not noise.
 - **Diagnostic:** VT-only changes MAE **2.68**; PEEP changes MAE **4.80** → the error is a **recruitment** effect (compliance shifts when PEEP moves).
 
-## Next (Track C #2 — the real fix)
-- Measure compliance-vs-PEEP from the data; build a **PEEP-aware (recruitment) compliance**; re-run → does the PEEP-change MAE drop?
-- Then a pH/CO₂ prediction experiment + revisit dead space.
+## Track C attempt #2 result (2026-06-20) — ✅ WIN
+- Built a **data-learned PEEP-aware compliance** `C×(1+β·ΔPEEP)`, β≈0.083/cmH₂O.
+- Honest train/test (learn on half the patients, score on the other half): PEEP-change MAE **4.48 → 3.21 = 28% better** on held-out patients.
+- Measured recruitment: compliance **+40%** when PEEP↑, **−23%** when PEEP↓. (The prototype's guessed ×0.1 was close.)
+
+## Next
+- **Ahmed:** confirm on the **full MIMIC-IV** (run `validate_mimic.py` locally; paste aggregates) before we change the production model.
+- **Phase 2:** once confirmed, implement the PEEP-aware compliance in `engine/physiology.py` + `optimizer.py`.
+- Then: a pH/CO₂ prediction experiment + revisit dead space.
 
 ## Open with Ahmed
 - When we reach a good point, **you** run `validate_mimic.py` on the **full MIMIC-IV** locally and paste back the aggregate numbers (governance rule).
