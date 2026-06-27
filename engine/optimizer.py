@@ -129,7 +129,11 @@ def _explain(setting, pred, base_mp, recruitable, mode, limits) -> str:
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     patient = PatientCase(pbw=70, pf_ratio=140, ri_index=0.8,
-                          base_paco2=70, hco3=24, permissive=True)
+                          base_paco2=70, hco3=24, permissive=True,
+                          age=60, sex="M", height_cm=175, weight_kg=80)
+    # Dead space defaults to the anatomic rule. Best: pass a real measurement, e.g.
+    # measured_vd_vt=0.6. Harris–Benedict is available via use_hb=True but our demo
+    # validation showed it worsened CO2 prediction, so it is opt-in.
     baseline = Baseline(vt=430, rr=20, peep=5, pplat=25, ppeak=30)
 
     print("=== VentOptimizer (research engine) — example case ===\n")

@@ -22,7 +22,7 @@
 ## Next
 - **Ahmed:** confirm on the **full MIMIC-IV** (run `validate_mimic.py` locally; paste aggregates) before we change the production model.
 - **Phase 2:** once confirmed, implement the PEEP-aware compliance in `engine/physiology.py` + `optimizer.py`.
-- Then: a pH/CO₂ prediction experiment + revisit dead space.
+- **Dead space (done 2026-06-20):** built Harris–Benedict + manual override in `physiology.py`. Validation: HB **worsened** CO₂ prediction on the demo (14.4→33.6 mmHg) → HB opt-in, manual wins, anatomic default. **Next: per-patient *learned* dead space** (fit from each patient's own CO₂ data — like the PEEP win).
 
 ## Open with Ahmed
 - When we reach a good point, **you** run `validate_mimic.py` on the **full MIMIC-IV** locally and paste back the aggregate numbers (governance rule).

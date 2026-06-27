@@ -116,3 +116,13 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Decision:** Don't pick one estimate on faith — run a 3-way head-to-head on our data (fixed 2.2 vs HB vs per-patient-learned). For true gold-standard accuracy, flag that a volumetric-capnography dataset would be needed (Phase 2+ / prospective).
 **Sources:** Vcap dead-space validation (Intensive Care Med 2011); estimated-VD/VT vs VR mortality comparison (Ann Intensive Care 2019).
 **Commit:** Phase 1 — dead-space accuracy hierarchy
+
+## 2026-06-20 — Built Harris–Benedict dead space + manual override; validated → HB WORSENED CO2 prediction
+**Question:** Does the Harris–Benedict physiological dead space improve CO2 prediction vs the fixed 2.2 mL/kg?
+**Method:** Built `dead_space_ml()` in physiology.py (priority: manual measured → HB → anatomic). Added a CO2 shadow test (Exp 4): predict the next ABG PaCO2 after a VT change, fixed vs HB. Demographics from patients/icustays/chartevents. 164 VT-change ABG pairs, 71 stays.
+**Result (aggregate):**
+- Fixed anatomic (2.2 mL/kg): MAE **14.42 mmHg**.
+- Harris–Benedict: MAE **33.59 mmHg** — **~133% WORSE.**
+**Why:** HB gives a much higher dead space (Vd/Vt ~0.5–0.73), making (VT − Vd) a small, noise-amplified number → CO2 predictions over-react to VT changes. Plus HB's resting-metabolism VCO2 estimate is off in non-resting ICU patients, and CO2 prediction over hours violates steady state (the fixed baseline MAE of 14 mmHg is already large — CO2 prediction is intrinsically noisy).
+**Decision:** Built as requested, but **HB is OPT-IN (`use_hb=False` default)** so it can't silently degrade the model; **manual measured dead space always wins**; anatomic stays the default. **Lesson: a more physiologically accurate dead space ≠ a better CO2 prediction.** Next: per-patient *learned* dead space (fit from the patient's own CO2 data), which optimizes for prediction directly.
+**Commit:** Phase 1 — HB dead space (built, opt-in; validation negative)

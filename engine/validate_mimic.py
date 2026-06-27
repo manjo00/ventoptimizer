@@ -34,6 +34,8 @@ try:
 except Exception:
     pass
 
+from physiology import estimate_vco2_ml_min   # Harris–Benedict CO2-production estimate
+
 # MIMIC-IV chart itemids → the fields we care about (confirmed in the demo dictionary).
 ITEMS = {
     224685: "vt",      # Tidal Volume (observed), mL
@@ -192,6 +194,82 @@ def exp3_peep_aware_compliance(d):
     }
 
 
+def load_demographics(demo_dir):
+    """Per-patient age, sex, height, weight, PBW — needed for the Harris–Benedict dead space."""
+    icu = pd.read_csv(os.path.join(demo_dir, "icu", "icustays.csv.gz"),
+                      usecols=["subject_id", "stay_id"], compression="gzip")
+    pat = pd.read_csv(os.path.join(demo_dir, "hosp", "patients.csv.gz"),
+                      usecols=["subject_id", "gender", "anchor_age"], compression="gzip").set_index("subject_id")
+    ce = pd.read_csv(os.path.join(demo_dir, "icu", "chartevents.csv.gz"),
+                     usecols=["stay_id", "itemid", "valuenum"], compression="gzip")
+    height = ce[ce["itemid"] == 226730].groupby("stay_id")["valuenum"].median()   # Height (cm)
+    weight = ce[ce["itemid"].isin([226512, 224639])].groupby("stay_id")["valuenum"].median()  # weight kg
+
+    s2subj = dict(zip(icu["stay_id"], icu["subject_id"]))
+    demo = {}
+    for sid in icu["stay_id"].unique():
+        subj = s2subj.get(sid)
+        if subj not in pat.index:
+            continue
+        h = height.get(sid)
+        if h is None or pd.isna(h):
+            continue
+        sex = "M" if str(pat.loc[subj, "gender"]).upper().startswith("M") else "F"
+        pbw = (50 if sex == "M" else 45.5) + 0.91 * (float(h) - 152.4)   # Devine PBW
+        w = weight.get(sid)
+        demo[int(sid)] = {
+            "age": float(pat.loc[subj, "anchor_age"]), "sex": sex, "height": float(h),
+            "weight": float(w) if (w is not None and not pd.isna(w)) else pbw, "pbw": pbw,
+        }
+    return demo
+
+
+def exp4_co2_prediction(snaps, demo):
+    """Predict the next arterial CO2 after a TIDAL-VOLUME change, two ways:
+       BASELINE — fixed anatomic dead space (2.2 mL/kg).
+       HARRIS–BENEDICT — physiological dead space from the patient's CO2 production.
+    Dead space only changes the prediction when VT changes, so we use VT-change ABG pairs.
+    No train/test needed — HB is a fixed published equation, nothing is fitted to the data."""
+    d = snaps.dropna(subset=["paco2", "vt", "rr"]).copy()
+    d = d[(d["paco2"] > 10) & (d["paco2"] < 150) & (d["vt"] >= 100) & (d["vt"] <= 1500) &
+          (d["rr"] > 0) & (d["rr"] <= 60)]
+    err_fixed, err_hb = [], []
+    for sid, g in d.groupby("stay_id"):
+        info = demo.get(int(sid))
+        if not info:
+            continue
+        pbw = info["pbw"]
+        vco2 = estimate_vco2_ml_min(info["age"], info["sex"], info["weight"], info["height"])
+        g = g.sort_values("charttime").reset_index(drop=True)
+        vt, rr, co = g["vt"].to_numpy(), g["rr"].to_numpy(), g["paco2"].to_numpy()
+        for i in range(1, len(g)):
+            if abs(vt[i] - vt[i - 1]) < 30:           # need a real VT change
+                continue
+            vd_fixed = 2.2 * pbw
+            vd_hb = vd_fixed
+            if vco2 and co[i - 1] > 0:
+                ve0 = (vt[i - 1] / 1000.0) * rr[i - 1]
+                vd_vt = min(max(1.0 - (vco2 * 0.863) / (co[i - 1] * ve0), 0.1), 0.85)
+                vd_hb = vd_vt * vt[i - 1]
+            va0f, va1f = (vt[i - 1] - vd_fixed) * rr[i - 1], (vt[i] - vd_fixed) * rr[i]
+            va0h, va1h = (vt[i - 1] - vd_hb) * rr[i - 1], (vt[i] - vd_hb) * rr[i]
+            if min(va0f, va1f, va0h, va1h) <= 0:
+                continue
+            err_fixed.append(co[i - 1] * va0f / va1f - co[i])     # predicted − measured
+            err_hb.append(co[i - 1] * va0h / va1h - co[i])
+    ef, eh = np.array(err_fixed), np.array(err_hb)
+    if ef.size == 0:
+        return {"vt_change_abg_pairs": 0}
+    mae = lambda x: round(float(np.mean(np.abs(x))), 2)
+    return {
+        "vt_change_abg_pairs": int(ef.size),
+        "baseline_MAE_mmHg (fixed 2.2/kg)": mae(ef),
+        "harris_benedict_MAE_mmHg": mae(eh),
+        "improvement_pct": round(float((np.mean(np.abs(ef)) - np.mean(np.abs(eh)))
+                                       / np.mean(np.abs(ef)) * 100), 1),
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--demo", required=True, help="path to the extracted MIMIC-IV demo folder")
@@ -218,7 +296,14 @@ def main():
     for k, v in exp3_peep_aware_compliance(d).items():
         print(f"   {k}: {v}")
     print("   → does adjusting compliance for the PEEP change beat the baseline")
-    print("     ON THE HELD-OUT TEST patients? (positive improvement_pct = yes)")
+    print("     ON THE HELD-OUT TEST patients? (positive improvement_pct = yes)\n")
+
+    print("Experiment 4 — CO2 prediction: anatomic dead space vs Harris–Benedict")
+    demo = load_demographics(args.demo)
+    print(f"   demographics available for {len(demo)} stays")
+    for k, v in exp4_co2_prediction(snaps, demo).items():
+        print(f"   {k}: {v}")
+    print("   → lower MAE = better; positive improvement_pct = HB beats the fixed rule.")
 
 
 if __name__ == "__main__":

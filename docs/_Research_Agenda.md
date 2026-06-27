@@ -34,6 +34,7 @@
   - **Among feasible (routine-data) estimates the literature is MIXED** — HB was unbiased in one study but *not* mortality-linked in another; VR tracked outcomes better in some. → no clear winner; let **our** data pick.
   - ★ **Best feasible route for OUR goal (predicting the next CO₂): learn each patient's *effective* dead space from their own data** — same trick as the PEEP-aware compliance: fit the dead space that makes the patient's own CO₂↔ventilation changes consistent. Likely beats any population equation for prediction.
 - **Plan:** head-to-head CO₂/pH shadow test on held-out patients — **(a)** fixed 2.2 mL/kg (baseline) vs **(b)** HB-estimated VD/VT vs **(c)** per-patient learned dead space — keep whichever predicts best. Same method as the PEEP win.
+- **RESULT (demo, 2026-06-20):** HB tested vs fixed on 164 VT-change ABG pairs — **HB was worse** (MAE 33.6 vs 14.4 mmHg): its high dead space amplifies CO₂ sensitivity, the resting-VCO₂ estimate is off in ICU patients, and CO₂ prediction over hours breaks steady state. HB kept but **opt-in** (`use_hb`); manual override always wins. → next = **(c) per-patient learned dead space**.
 
 ### Q4 — Are the safety limits the right ones?
 - Plateau ≤30, VT 4–8 mL/kg are well-cited. **Driving pressure** (Amato) is *not yet* an explicit objective/limit — should it be? The manuscript shows MP harm with no safe floor, so should the score weight driving pressure too?

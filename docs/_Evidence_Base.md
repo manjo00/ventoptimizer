@@ -38,6 +38,7 @@ MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
 - Origin: `[N3a]` Radford EP. *Ventilation standards for use in artificial respiration.* J Appl Physiol 1955 — anatomic dead space ≈ **1 mL/lb = 2.2 mL/kg**.
 - ⚠️ Caution: `[N3b]` *Anatomic Dead Space Cannot Be Predicted by Body Weight* (Respir Care 2021) found the weight estimate barely correlates with measured dead space (r² ≈ 0.0002; mean error 60 ± 54 mL). So 2.2 mL/kg is a **rough convention**, a real accuracy weakness, and a Track-C candidate (better estimate, or measure it).
 - 🟥 **Bigger problem `[N4]`:** the 2.2 mL/kg *anatomic* rule (Vd/Vt ≈ 0.36) badly underestimates *physiological* dead space, which in ARDS is **0.5–0.7** and independently predicts mortality (Vd/Vt 0.54 survivors vs 0.63 non-survivors) — `[N4]` Nuckton TJ, et al. *Pulmonary dead-space fraction as a risk factor for death in ARDS.* NEJM 2002;346:1281–6. → our CO₂/pH predictions are biased in sick lungs; fix with a physiological estimate (ventilatory ratio). See `_Literature_Validation` T9.
+- **BUILT + TESTED (2026-06-20):** added a Harris–Benedict physiological dead space (+ manual measured override) in `physiology.py`. On the demo it **worsened** CO₂ prediction (MAE 14.4→33.6 mmHg) — so HB is **opt-in only**; the anatomic rule stays the default and a **measured value (manual) always wins**. See `_Research_Log`. A *more accurate dead space ≠ a better CO₂ prediction*.
 
 ## Gas-exchange pH & permissive hypercapnia  `[E6]`
 - Henderson–Hasselbalch (pH = 6.1 + log10(HCO₃ / (0.03 × PaCO₂))) is standard physiology.

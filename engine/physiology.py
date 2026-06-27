@@ -30,6 +30,16 @@ class PatientCase:
     base_paco2: float   # current arterial CO2 (mmHg)
     hco3: float         # bicarbonate (mmol/L)
     permissive: bool    # allow higher CO2 (pH floor 7.20 instead of 7.30)?
+    # --- optional: enable the Harris–Benedict physiological dead space (else we fall back) ---
+    age: float = None             # years
+    sex: str = None               # "M" or "F"
+    height_cm: float = None       # height in cm
+    weight_kg: float = None       # actual weight (kg); falls back to PBW if missing
+    use_hb: bool = False          # opt-in Harris–Benedict dead space (OFF by default — our
+                                  # demo validation showed it WORSENED CO2 prediction; see _Research_Log)
+    # --- optional MANUAL overrides (use a real measurement if you have one) ---
+    measured_deadspace_ml: float = None   # a measured dead space, in mL
+    measured_vd_vt: float = None          # a measured dead-space fraction, 0–1
 
 
 @dataclass
@@ -66,6 +76,54 @@ class Prediction:
 
 
 # ---------------------------------------------------------------------------
+# Dead space — how much of each breath is "wasted" (doesn't exchange gas).
+# We try three sources, best first (see docs/_Literature_Validation.md T9 and
+# docs/_Research_Agenda.md Q3):
+#   1) a MANUAL measured value, if the clinician has one;
+#   2) the Harris–Benedict physiological estimate (needs age/sex/height);
+#   3) the old anatomic 2.2 mL/kg rule, as a fallback.
+# ---------------------------------------------------------------------------
+
+def estimate_vco2_ml_min(age, sex, weight_kg, height_cm, rq=0.8):
+    """Estimate CO2 production (mL/min) from the Harris–Benedict resting-energy
+    equation. Plain words: predict how much CO2 the body makes from age, sex,
+    height and weight. Returns None if any input is missing."""
+    if age is None or sex is None or weight_kg is None or height_cm is None:
+        return None
+    if str(sex).upper().startswith("M"):
+        ree = 66.47 + 13.75 * weight_kg + 5.003 * height_cm - 6.755 * age   # kcal/day
+    else:
+        ree = 655.1 + 9.563 * weight_kg + 1.850 * height_cm - 4.676 * age
+    # Weir equation (energy ↔ gas): REE = 1.44 × VCO2 × (3.94/rq + 1.11)
+    return ree / (1.44 * (3.94 / rq + 1.11))    # mL/min
+
+
+def dead_space_ml(pt: PatientCase, vt_ml: float, rr: float, paco2: float) -> float:
+    """Physiological dead space (mL): manual → Harris–Benedict → anatomic fallback."""
+    # 1) manual / measured override
+    if pt.measured_deadspace_ml is not None:
+        return pt.measured_deadspace_ml
+    if pt.measured_vd_vt is not None:
+        return pt.measured_vd_vt * vt_ml
+
+    # 2) Harris–Benedict physiological estimate — OPT-IN only.
+    #    Our demo validation showed HB worsened CO2 prediction (14.4 → 33.6 mmHg),
+    #    so it is OFF unless pt.use_hb is set. See docs/_Research_Log.md (2026-06-20).
+    if pt.use_hb:
+        weight = pt.weight_kg if pt.weight_kg is not None else pt.pbw
+        vco2 = estimate_vco2_ml_min(pt.age, pt.sex, weight, pt.height_cm)
+        ve_l_min = (vt_ml / 1000.0) * rr        # minute ventilation, L/min
+        if vco2 is not None and paco2 and paco2 > 0 and ve_l_min > 0:
+            # Dead-space fraction: VD/VT = 1 − (VCO2 × 0.863) / (PaCO2 × minute ventilation)
+            vd_vt = 1.0 - (vco2 * 0.863) / (paco2 * ve_l_min)
+            vd_vt = min(max(vd_vt, 0.1), 0.85)  # clamp to a plausible range
+            return vd_vt * vt_ml
+
+    # 3) default / fallback: the anatomic rule
+    return 2.2 * pt.pbw
+
+
+# ---------------------------------------------------------------------------
 # Step 1: work out the patient's baseline mechanics (done once per patient).
 # ---------------------------------------------------------------------------
 
@@ -83,8 +141,8 @@ def baseline_mechanics(pt: PatientCase, base: Baseline) -> Mechanics:
     # §4 Resistance = pressure-gap ÷ flow. Flow is assumed ~1 L/s here.
     r_aw = resistive_gap / ((base.vt / 1000.0) / 1.0)
 
-    # §6 Dead space ≈ 2.2 mL per kg of predicted body weight (rough rule).
-    v_deadspace = 2.2 * pt.pbw
+    # §6 Dead space: physiological estimate (manual → Harris–Benedict → anatomic fallback).
+    v_deadspace = dead_space_ml(pt, base.vt, base.rr, pt.base_paco2)
 
     # §6 Alveolar ventilation = the part of breathing that actually clears CO2.
     base_valv = base.rr * (base.vt - v_deadspace)
