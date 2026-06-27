@@ -10,6 +10,7 @@ The hard PEEP / recruitment problem is **PARKED** (Ahmed) — finish the solvabl
 ## Solvable focus (in order)
 1. ✅ **DONE — MP savings from VT↔RR redistribution: near-zero.** On 3,077 real snapshots, median **0.1 J/min** savable; only 7.6% could save ≥1. At constant CO₂ clearance the *safe* knob barely moves power. (`_Research_Log`.)
 2. ⭐ **NOW — MP savings from permissive hypercapnia** (the real lever): allow CO₂ to rise to a pH floor → reduce ventilation → measure the MP drop, on real patients. (With the raised-ICP contraindication gate.)
+   - **Note — manual limit:** include a **practitioner-set, patient-specific pH/CO₂ limit** (from their knowledge of the case) that overrides the default; the tool uses the **stricter** of the manual limit and the evidence-based floor.
 3. **Driving pressure as an explicit target/output** (Costa 2021, Amato 2015).
 4. Per-patient *learned* dead space (revisit; CO₂ prediction is noisy → lower yield).
 

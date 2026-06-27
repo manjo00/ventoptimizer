@@ -15,6 +15,7 @@ Folder renamed to VentOptimizer, git initialized, Project Brain seeded, v2.4 log
 ### Scope focus (refined 2026-06-20)
 We proved the *safe, easy* knob (rebalance VT↔RR) barely moves mechanical power. So the project now hinges on the **two real MP levers**, and each has **two questions** — both answered with **high-quality / Q1 evidence**:
 1. **Permissive hypercapnia** *(solvable now)* — (a) how far can CO₂ rise / how low can pH go **safely**? (b) how much MP does that buy? (Gate: not for raised-ICP / brain injury.)
+   - **Note — manual limit:** allow the practitioner to set a patient-specific pH/CO₂ limit from their own knowledge of the case (same pattern as the manual dead-space override). The tool uses the **stricter** of that manual limit and the evidence-based floor.
 2. **PEEP / recruitment** *(the parked hard problem)* — (a) how to handle the individual, unpredictable response? (b) how much MP does it actually affect? Return to this after #1.
 
 ### Phase 1 — Model accuracy & research  ← WE ARE HERE
