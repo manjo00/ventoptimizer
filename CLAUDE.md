@@ -21,6 +21,7 @@ The evidence that minimizing Mechanical Power is the right goal comes from Ahmed
 - **Every formula, constant, and threshold must trace to a citation in `docs/_Evidence_Base.md`.** No invented clinical numbers, ever.
 - If something is an assumption or a guess, say so out loud and tag it `[ASSUMPTION]` in the docs.
 - This tool advises; it never decides. Always frame output as a suggestion a clinician reviews.
+- **Validate theories with papers, and label the strength** (RCT-proven > observational > our-own-data). The premise (minimize Mechanical Power) is strong *association*, **not** RCT-proven as an intervention — the tool reflects best evidence, not proven therapy. Two standing rules from the evidence: *association ≠ intervention*, and *our PEEP-aware compliance is for prediction only, never to titrate PEEP for "better compliance" (the ART trial showed that harms).* See `docs/_Literature_Validation.md`.
 
 ### 3. 🟢 Git checkpoint every session
 This folder is a git repo. Before changing files, create a rollback point yourself:
@@ -73,6 +74,7 @@ The whole point of this setup is to NOT re-read everything. Match the task to th
 |---|---|
 | The physiology / equations / "why" | `docs/_Clinical_Logic.md` |
 | The research evidence / a clinical number | `docs/_Evidence_Base.md` |
+| Whether a theory is paper-proven (and how strongly) | `docs/_Literature_Validation.md` |
 | Data shapes (inputs/outputs/limits) | `docs/_Schema.md` |
 | The MIMIC data field codes (itemids) | `docs/_Data_Dictionary.md` |
 | How pieces connect | `docs/_Architecture.md` |

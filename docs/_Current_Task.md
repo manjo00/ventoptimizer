@@ -28,4 +28,4 @@
 - When we reach a good point, **you** run `validate_mimic.py` on the **full MIMIC-IV** locally and paste back the aggregate numbers (governance rule).
 
 ## Noticed (not fixing now)
-- (none)
+- 🚩 **Optimizer design-safety (Phase 2/3):** the recruitment logic could recommend higher PEEP to lower MP via modeled compliance gains. The ART trial (JAMA 2017) showed compliance-titrated PEEP *increased* mortality → constrain the optimizer so it never pushes PEEP up justified only by modeled compliance. See `_Literature_Validation.md`.

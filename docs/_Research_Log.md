@@ -69,3 +69,14 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 - Held-out test: baseline MAE 4.48 → **PEEP-aware MAE 3.21 = 28.3% improvement.**
 **Decision:** First validated model improvement. Caveat: small demo (73 test events) → **Ahmed confirms on full MIMIC-IV before we change the production model** (`physiology.py`) in Phase 2. Per-patient R/I could refine β further later.
 **Commit:** Phase 1 — Track C #2 (PEEP-aware compliance) validated
+
+## 2026-06-20 — Literature validation of our core theories
+**Question:** Do published papers actually prove our theories — and how strongly?
+**Method:** Focused literature pass on each core claim; built `_Literature_Validation.md` (a theory→proof register with a strength grade).
+**Result:**
+- **MP→mortality (north star):** strongly supported by many cohorts + a meta-analysis + our manuscript — BUT **no RCT proves lowering MP saves lives** (recent MP-guided trials mixed). → strong *association*, not proven intervention.
+- **Safety limits (Pplat≤30, VT~6):** RCT-proven (ARDSNet 2000). Driving pressure: strong (Amato 2015). MP equation: validated (Chiumello 2020). Compliance nonlinearity: supported (Hickling 1998).
+- **Recruitment (our finding):** ⚠️ literature corroborates compliance shifts with PEEP *in direction* (~10% in one study; our demo ~40%, likely case-mix/measurement-inflated), but **compliance change ≠ recruitment** (Crit Care 2022) and **compliance-titrated PEEP INCREASED mortality** (ART trial, JAMA 2017).
+**Decision:** Two standing honesty rules added to CLAUDE.md — (1) association ≠ intervention; (2) our PEEP-aware compliance is for **prediction only**, never PEEP titration. Logged an optimizer design-safety flag (don't push PEEP up to chase compliance).
+**Sources:** Serpa Neto 2018; Urner 2020; Azizi 2023; Gattinoni 2016; Chiumello 2020; Brower/ARDSNet 2000; Amato 2015; Hickling 1998; Chen 2020; Cavalcanti/ART JAMA 2017; Crit Care 2022 (PMID 35918772).
+**Commit:** Phase 1 — literature validation
