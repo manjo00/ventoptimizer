@@ -80,3 +80,16 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Decision:** Two standing honesty rules added to CLAUDE.md — (1) association ≠ intervention; (2) our PEEP-aware compliance is for **prediction only**, never PEEP titration. Logged an optimizer design-safety flag (don't push PEEP up to chase compliance).
 **Sources:** Serpa Neto 2018; Urner 2020; Azizi 2023; Gattinoni 2016; Chiumello 2020; Brower/ARDSNet 2000; Amato 2015; Hickling 1998; Chen 2020; Cavalcanti/ART JAMA 2017; Crit Care 2022 (PMID 35918772).
 **Commit:** Phase 1 — literature validation
+
+## 2026-06-20 — Literature validation, part 2: gas exchange + remaining theories ("to everything")
+**Question:** Paper-proof the rest of the model — gas exchange, dead space, permissive hypercapnia, the auto-PEEP rule, and the low-VT/high-RR strategy.
+**Method:** Targeted literature pass; added T8–T12 to `_Literature_Validation.md`.
+**Result:**
+- **T8 Gas exchange:** our inverse CO₂↔alveolar-ventilation rule = standard physiology ✅ (caveats: constant CO₂ production + steady state).
+- **T9 Dead space 🟥:** the *anatomic* 2.2 mL/kg (Vd/Vt ≈ 0.36) badly underestimates *physiological* dead space (ARDS 0.5–0.7), which predicts mortality (Nuckton NEJM 2002). **Biggest gas-side flaw** → fix with ventilatory-ratio dead space.
+- **T10 Permissive hypercapnia:** pH ~7.20 floor OK, BUT contraindicated in raised ICP / brain injury → needs a gate.
+- **T11 Auto-PEEP rule:** 3τ ≈ 95% emptying is standard & conservative (recent data: ~2.2τ). Our rule is safe.
+- **T12 Low-VT/high-RR strategy ✅:** Costa 2021 — driving pressure's mortality impact is ~4× RR's → our bias is supported; make driving pressure an explicit target.
+**Decision:** Two new design-safety flags (permissive-mode ICP gate; recruitment/PEEP from part 1) + driving-pressure-as-target. Next gas-side experiment should test a physiological dead-space estimate. Every core theory now graded in `_Literature_Validation.md`.
+**Sources:** alveolar-ventilation physiology; Nuckton NEJM 2002; permissive-hypercapnia reviews; expiratory-time-constant reviews; Costa AJRCCM 2021.
+**Commit:** Phase 1 — literature validation part 2

@@ -48,7 +48,8 @@ Alveolar ventilation Va = RR × (VT − dead space)
 Predicted CO₂  = (baseline Va × baseline CO₂) ÷ new Va     (inverse rule)
 Predicted pH   = 6.1 + log10( HCO₃ ÷ (0.03 × CO₂) )        (Henderson–Hasselbalch)
 ```
-- **Permissive hypercapnia:** we let CO₂ rise but only to a pH floor (7.30 standard, 7.20 permissive) — ARDSNet-aligned pragmatic conventions `[E3, E6]`; ~7.20 is the widely accepted (if somewhat arbitrary) lower bound.
+- **Permissive hypercapnia:** we let CO₂ rise but only to a pH floor (7.30 standard, 7.20 permissive) — ARDSNet-aligned pragmatic conventions `[E3, E6]`; ~7.20 is the widely accepted (if somewhat arbitrary) lower bound. ⚠️ **Contraindicated with raised intracranial pressure / brain injury** (CO₂ raises ICP) — permissive mode needs a safety gate (`_Literature_Validation` T10).
+- 🟥 **Dead space is the weak link `[N4]`:** real *physiological* dead space in ARDS is 0.5–0.7 of VT (vs ~0.36 from our anatomic 2.2 mL/kg) and predicts mortality (Nuckton, NEJM 2002) → CO₂/pH predictions are biased in sick lungs. Track-C fix: a physiological estimate (ventilatory ratio). See `_Literature_Validation` T9.
 
 ## 7. The baseline plateau pressure is mandatory  `[STANDARD]`
 Everything keys off the measured `Pplat` (via an inspiratory hold) because that's what gives the starting compliance `C`. Without it, the model has no anchor and cannot predict.

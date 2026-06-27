@@ -29,3 +29,5 @@
 
 ## Noticed (not fixing now)
 - 🚩 **Optimizer design-safety (Phase 2/3):** the recruitment logic could recommend higher PEEP to lower MP via modeled compliance gains. The ART trial (JAMA 2017) showed compliance-titrated PEEP *increased* mortality → constrain the optimizer so it never pushes PEEP up justified only by modeled compliance. See `_Literature_Validation.md`.
+- 🚩 **Permissive-mode gate (Phase 2/3):** "Permissive CO₂" must not apply to raised-ICP / brain-injured patients (hypercapnia raises ICP) — add a contraindication flag. (`_Literature_Validation` T10.)
+- 🩺 **Driving pressure as an explicit target:** Costa 2021 — driving pressure's mortality impact is ~4× respiratory rate's. Consider adding it to the objective/limits. (`_Literature_Validation` T12.)

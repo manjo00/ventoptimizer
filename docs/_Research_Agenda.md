@@ -24,6 +24,7 @@
 - **We assume:** dead space = 2.2 mL/kg; CO₂ scales inversely with alveolar ventilation.
 - **Test:** predict PaCO₂/pH after a settings change vs the next ABG in MIMIC.
 - **Fix if wrong:** better dead-space estimate; consider **EtCO₂ as a real-time proxy** (solves the "ABG lag" problem).
+- **LITERATURE (2026-06-20):** the inverse CO₂↔alveolar-ventilation rule is standard physiology (valid). But our **anatomic 2.2 mL/kg dead space badly underestimates physiological dead space** (ARDS Vd/Vt 0.5–0.7; Nuckton NEJM 2002) → likely the main CO₂/pH error. Fix = ventilatory-ratio-based physiological dead space. See `_Literature_Validation` T9.
 
 ### Q4 — Are the safety limits the right ones?
 - Plateau ≤30, VT 4–8 mL/kg are well-cited. **Driving pressure** (Amato) is *not yet* an explicit objective/limit — should it be? The manuscript shows MP harm with no safe floor, so should the score weight driving pressure too?

@@ -21,6 +21,7 @@ MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
 ## Lung-protective safety limits
 - **Plateau ≤ 30 cmH₂O** and **VT 4–8 mL/kg PBW** — `[E3] = ref 3` Brower RG, et al. (ARDS Network). NEJM 2000;342:1301–8 (6 mL/kg, Pplat cap 30; mortality 39.8%→31.0%).
 - **Driving pressure (Pplat − PEEP)** is the ventilator variable most tied to mortality — `[E4] = ref 4` Amato MBP, et al. NEJM 2015;372:747–55. **Decision:** keep MP as the primary objective; evaluate adding driving pressure as a co-monitor/limit in Track C (with data), not bolt it on blindly.
+- **Reinforced `[N5]`:** Costa EL, et al. *Ventilatory variables and mechanical power in ARDS.* AJRCCM 2021;204:303–11 — driving pressure's mortality impact is ~**4× respiratory rate's**, and a driving-pressure + RR model ≈ full MP. Supports our low-VT/high-RR bias and makes driving pressure a strong explicit-target candidate. See `_Literature_Validation` T12.
 
 ## Recruitment-to-Inflation (R/I) index  `[N1]` — concept & 0.5 threshold now CITED
 - `[N1]` Chen L, Del Sorbo L, Grieco DL, et al. *Potential for Lung Recruitment Estimated by the Recruitment-to-Inflation Ratio in ARDS. A Clinical Trial.* Am J Respir Crit Care Med 2020;201(2):178–187.
@@ -36,6 +37,7 @@ MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
 ## Dead space ≈ 2.2 mL/kg — used, but weakly validated  `[N3]`
 - Origin: `[N3a]` Radford EP. *Ventilation standards for use in artificial respiration.* J Appl Physiol 1955 — anatomic dead space ≈ **1 mL/lb = 2.2 mL/kg**.
 - ⚠️ Caution: `[N3b]` *Anatomic Dead Space Cannot Be Predicted by Body Weight* (Respir Care 2021) found the weight estimate barely correlates with measured dead space (r² ≈ 0.0002; mean error 60 ± 54 mL). So 2.2 mL/kg is a **rough convention**, a real accuracy weakness, and a Track-C candidate (better estimate, or measure it).
+- 🟥 **Bigger problem `[N4]`:** the 2.2 mL/kg *anatomic* rule (Vd/Vt ≈ 0.36) badly underestimates *physiological* dead space, which in ARDS is **0.5–0.7** and independently predicts mortality (Vd/Vt 0.54 survivors vs 0.63 non-survivors) — `[N4]` Nuckton TJ, et al. *Pulmonary dead-space fraction as a risk factor for death in ARDS.* NEJM 2002;346:1281–6. → our CO₂/pH predictions are biased in sick lungs; fix with a physiological estimate (ventilatory ratio). See `_Literature_Validation` T9.
 
 ## Gas-exchange pH & permissive hypercapnia  `[E6]`
 - Henderson–Hasselbalch (pH = 6.1 + log10(HCO₃ / (0.03 × PaCO₂))) is standard physiology.
