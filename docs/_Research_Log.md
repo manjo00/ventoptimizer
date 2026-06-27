@@ -104,3 +104,15 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Decision:** recommend building **HB-estimated VD/VT as the backbone** (accuracy + usable fraction) with **VR as a simple cross-check**, then validate by CO₂/pH shadow test vs the anatomic-2.2-mL/kg baseline on held-out patients. EtCO₂/AVDSf later for real-time. Recorded as candidate fixes in `_Research_Agenda` Q3.
 **Sources:** Sinha (ventilatory ratio); Beitler CCM 2015 (estimated VD/VT); Yang/Morales (EtCO₂ AVDSf).
 **Commit:** Phase 1 — dead-space solution scouting
+
+## 2026-06-20 — "Is there a more proven / more accurate way?" — accuracy hierarchy
+**Question:** Is there a more accurate/proven dead-space method than the estimation equations?
+**Method:** Literature check on gold-standard measurement + head-to-head accuracy of estimates.
+**Result:**
+- **Yes — the gold standard is direct measurement (volumetric capnography / Bohr).** It's far more accurate than any estimate, BUT it's not recorded in MIMIC → unavailable to us retrospectively. (The Enghoff/PaCO₂ version also conflates shunt.)
+- **Among routine-data estimates the evidence is genuinely mixed** — no single equation is clearly "most proven" (HB unbiased in one study, not mortality-linked in another; VR better in some cohorts).
+- **Key reframe:** the accuracy limit is the *data*, not the equation. On routine retrospective data we're capped at estimates.
+- ★ **Best feasible route for our prediction goal: learn each patient's *effective* dead space from their own CO₂ data** (like the PEEP-aware compliance), which should beat population equations for prediction.
+**Decision:** Don't pick one estimate on faith — run a 3-way head-to-head on our data (fixed 2.2 vs HB vs per-patient-learned). For true gold-standard accuracy, flag that a volumetric-capnography dataset would be needed (Phase 2+ / prospective).
+**Sources:** Vcap dead-space validation (Intensive Care Med 2011); estimated-VD/VT vs VR mortality comparison (Ann Intensive Care 2019).
+**Commit:** Phase 1 — dead-space accuracy hierarchy

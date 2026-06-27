@@ -29,7 +29,11 @@
   1. **Ventilatory Ratio (VR)** = (measured minute ventilation × PaCO₂) ÷ (PBW×100 × 37.5). Needs only VT, RR, PaCO₂, PBW — all in MIMIC. Validated, mortality-predictive (Sinha). ★ simplest.
   2. **Harris–Benedict estimated VD/VT** (Beitler, Crit Care Med 2015): estimate CO₂ production from the Harris–Benedict energy equation, back-out VD/VT via the Enghoff–Bohr rearrangement. **Unbiased** (0.59 vs 0.60 measured; within ±0.10 in 70%). Needs age/sex/weight/PaCO₂/minute-ventilation — all available. ★ best accuracy; gives a directly-usable fraction.
   3. **EtCO₂ alveolar dead-space fraction** AVDSf = (PaCO₂ − EtCO₂) ÷ PaCO₂ (or Frankenfield eq.). Captures alveolar dead space **and is real-time** (also tackles the ABG-lag goal) — but EtCO₂ is sparse in MIMIC (demo: 202 rows). Partial-coverage add-on.
-- **Plan:** replace fixed 2.2 mL/kg with a per-patient physiological dead space (HB or VR), then re-run a CO₂/pH shadow test (predict the next ABG after a settings change) and compare error vs the anatomic baseline on held-out patients — same method as the PEEP win.
+- **Accuracy hierarchy (2026-06-20):**
+  - **Most accurate = direct measurement (volumetric capnography / Bohr dead space).** NOT in MIMIC → unavailable retrospectively; the true accuracy ceiling needs a dataset that records it (prospective/Vcap). Note the Enghoff/PaCO₂ version conflates shunt, so it's a gas-exchange index, not pure dead space.
+  - **Among feasible (routine-data) estimates the literature is MIXED** — HB was unbiased in one study but *not* mortality-linked in another; VR tracked outcomes better in some. → no clear winner; let **our** data pick.
+  - ★ **Best feasible route for OUR goal (predicting the next CO₂): learn each patient's *effective* dead space from their own data** — same trick as the PEEP-aware compliance: fit the dead space that makes the patient's own CO₂↔ventilation changes consistent. Likely beats any population equation for prediction.
+- **Plan:** head-to-head CO₂/pH shadow test on held-out patients — **(a)** fixed 2.2 mL/kg (baseline) vs **(b)** HB-estimated VD/VT vs **(c)** per-patient learned dead space — keep whichever predicts best. Same method as the PEEP win.
 
 ### Q4 — Are the safety limits the right ones?
 - Plateau ≤30, VT 4–8 mL/kg are well-cited. **Driving pressure** (Amato) is *not yet* an explicit objective/limit — should it be? The manuscript shows MP harm with no safe floor, so should the score weight driving pressure too?
