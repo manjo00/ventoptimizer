@@ -270,6 +270,61 @@ def exp4_co2_prediction(snaps, demo):
     }
 
 
+def exp5_mp_reduction_available(snaps, demo):
+    """The tool's core value on real patients: how much mechanical power could be
+    SAFELY saved by redistributing tidal volume <-> rate, with PEEP held, alveolar
+    ventilation (CO2 clearance) preserved, VT kept 4-8 mL/kg, and plateau <= 30 —
+    using each patient's OWN measured mechanics. Achievable MP vs delivered MP."""
+    d = snaps.dropna(subset=["vt", "rr", "peep", "pplat", "ppeak"]).copy()
+    d = d[(d["pplat"] > d["peep"]) & (d["pplat"] <= 40) & (d["ppeak"] >= d["pplat"]) &
+          (d["vt"] >= 100) & (d["vt"] <= 1200) & (d["rr"] > 0) & (d["rr"] <= 45)]
+
+    def mp(rr, vt_ml, ppeak, pplat, peep):
+        return 0.098 * rr * (vt_ml / 1000.0) * (ppeak - 0.5 * (pplat - peep))
+
+    actual_mps, reductions = [], []
+    for sid, g in d.groupby("stay_id"):
+        info = demo.get(int(sid))
+        if not info:
+            continue
+        pbw = info["pbw"]
+        vd = 2.2 * pbw
+        for vt0, rr0, peep, pplat, ppeak in zip(g["vt"], g["rr"], g["peep"], g["pplat"], g["ppeak"]):
+            if (pplat - peep) <= 0 or (vt0 - vd) <= 0:
+                continue
+            C = vt0 / (pplat - peep)                 # the patient's OWN measured compliance
+            gap = ppeak - pplat                      # their OWN resistive gap
+            va_target = (vt0 - vd) * rr0             # alveolar ventilation to preserve (keeps CO2 ~constant)
+            actual = mp(rr0, vt0, ppeak, pplat, peep)
+            best = actual
+            for vt in range(int(4 * pbw), int(8 * pbw) + 1, 5):   # lung-protective VT window
+                if (vt - vd) <= 0:
+                    continue
+                rr = va_target / (vt - vd)           # rate that preserves alveolar ventilation
+                if rr < 5 or rr > 35:
+                    continue
+                pplat_new = peep + vt / C
+                if pplat_new > 30:                   # plateau safety cap
+                    continue
+                m = mp(rr, vt, pplat_new + gap, pplat_new, peep)
+                if m < best:
+                    best = m
+            actual_mps.append(actual)
+            reductions.append(actual - best)
+
+    if not reductions:
+        return {"snapshots": 0}
+    r, a = np.array(reductions), np.array(actual_mps)
+    return {
+        "snapshots": int(r.size),
+        "median_delivered_MP_Jmin": round(float(np.median(a)), 1),
+        "median_MP_savable_Jmin": round(float(np.median(r)), 2),
+        "mean_MP_savable_Jmin": round(float(np.mean(r)), 2),
+        "pct_snapshots_>=1_Jmin_savable": round(float(np.mean(r >= 1) * 100), 1),
+        "pct_snapshots_>=3_Jmin_savable": round(float(np.mean(r >= 3) * 100), 1),
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--demo", required=True, help="path to the extracted MIMIC-IV demo folder")
@@ -303,7 +358,12 @@ def main():
     print(f"   demographics available for {len(demo)} stays")
     for k, v in exp4_co2_prediction(snaps, demo).items():
         print(f"   {k}: {v}")
-    print("   → lower MAE = better; positive improvement_pct = HB beats the fixed rule.")
+    print("   → lower MAE = better; positive improvement_pct = HB beats the fixed rule.\n")
+
+    print("Experiment 5 — how much mechanical power could be SAFELY saved (VT↔RR, PEEP held)")
+    for k, v in exp5_mp_reduction_available(snaps, demo).items():
+        print(f"   {k}: {v}")
+    print("   → the tool's core value: lower power at the same CO2 clearance, within limits.")
 
 
 if __name__ == "__main__":

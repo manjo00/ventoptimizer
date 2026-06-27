@@ -57,7 +57,7 @@
 - **D — (future/clinical):** EIT or esophageal pressure for direct individual response (needs special equipment; not in MIMIC).
 - **Standing rule:** never push PEEP up just to chase compliance (ART). See `_Literature_Validation` T7.
 
-**Decision:** pending Ahmed's choice of direction.
+**Decision:** **PARKED for now** (Ahmed, 2026-06-20) — finish the solvable items first, then return to this hard problem. Options A–D above are ready to pick up.
 
 ## The validation loop (the Phase 1 engine of progress)
 1. **Shadow test:** pull real ventilated MIMIC-IV patients (`validate_mimic.py`).

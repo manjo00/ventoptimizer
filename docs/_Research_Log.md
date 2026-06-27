@@ -134,3 +134,12 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Decision:** pending Ahmed's pick of direction. **Strong candidate = A as default + B when history exists.**
 **Sources:** Ann Intensive Care 2024 (bedside PEEP methods vs recruitability); ART JAMA 2017.
 **Commit:** Phase 1 — PEEP-problem design direction
+
+## 2026-06-20 — Solvable win #1: how much MP can VT↔RR redistribution save? → almost none
+**Question:** With PEEP held and CO2 clearance preserved, how much mechanical power can be safely saved by rebalancing VT↔RR within lung-protective limits, on real patients?
+**Method:** Exp 5 on the demo — 3,077 ventilated snapshots; used each patient's OWN measured compliance + resistive gap; held alveolar ventilation constant (≈ constant CO2); VT 4–8 mL/kg, plateau ≤ 30.
+**Result:** median delivered MP **15.7 J/min**; **median MP savable = 0.1 J/min** (mean 0.32); only **7.6%** of snapshots could save ≥1 J/min, **0.6%** ≥3.
+**Why:** at constant CO2 clearance, lowering VT forces RR up (more breaths), and the fixed dead space per breath erodes the benefit — so MP is nearly flat across the allowed VT/RR range. The classic "low VT, high RR" benefit largely cancels once gas exchange is held constant; and many patients are already at protective VT, so the lever is mostly spent.
+**Implication (important — reshapes the value proposition):** the SAFE knob (VT↔RR at constant ventilation) barely moves MP. Real MP reduction must come from **(a) permissive hypercapnia** (accept higher CO2 → less ventilation → lower MP; the prototype's actual main lever), or **(b) PEEP / driving pressure** (the parked hard problem).
+**Decision:** next solvable experiment = quantify MP savings from **permissive hypercapnia** (reduce ventilation to a pH floor), where the achievable savings actually are — with the raised-ICP contraindication gate.
+**Commit:** Phase 1 — MP-savings via VT/RR redistribution (near-zero)
