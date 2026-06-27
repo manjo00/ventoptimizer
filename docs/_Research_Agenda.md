@@ -45,6 +45,20 @@
 
 ---
 
+## ⭐ The PEEP problem — the genuinely hard core (Ahmed's insight, 2026-06-20)
+**Ahmed (from his own work):** PEEP response is **heterogeneous and individual** — higher PEEP *lowers* mechanical power in some patients and *raises* it in others. The R/I (recruitment-to-inflation) index isn't enough because (1) it must be **measured by a bedside maneuver** — inconvenient for practitioner and patient; and (2) even when it says "recruitable," it does **not** tell you **how much** PEEP to add.
+
+**This matches our data + the literature:** our demo showed exactly this heterogeneity (compliance +40% PEEP↑ in some, −23% PEEP↓ in others); the population slope β≈0.083 we fit is just an *average* that fits no individual well. Literature: no bedside method cleanly predicts individual recruitability — EIT, esophageal/transpulmonary pressure, and respiratory-mechanics methods give *different* "optimal" PEEPs and none tracked recruitability well (Ann Intensive Care 2024). ART (JAMA 2017): getting PEEP wrong kills.
+
+**Design options (pick a direction):**
+- **A — PEEP humility (default, safest):** optimize the knobs we predict *well* (VT, RR → plateau MAE 2.68) and **hold PEEP** at the clinician/guideline value; don't recommend PEEP moves the model can't stand behind. **Drops the need for R/I entirely.**
+- **B — Learn the patient's OWN PEEP response from their charted history** (no maneuver; gives a per-patient magnitude, not just yes/no). Falls back to A when there's no PEEP history.
+- **C — Closed-loop test-step:** suggest a *small reversible* PEEP step, read the *actual* MP/compliance response, then decide — test instead of predict.
+- **D — (future/clinical):** EIT or esophageal pressure for direct individual response (needs special equipment; not in MIMIC).
+- **Standing rule:** never push PEEP up just to chase compliance (ART). See `_Literature_Validation` T7.
+
+**Decision:** pending Ahmed's choice of direction.
+
 ## The validation loop (the Phase 1 engine of progress)
 1. **Shadow test:** pull real ventilated MIMIC-IV patients (`validate_mimic.py`).
 2. For each, feed their state into `physiology.predict()`.

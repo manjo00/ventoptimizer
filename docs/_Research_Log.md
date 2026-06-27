@@ -126,3 +126,11 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Why:** HB gives a much higher dead space (Vd/Vt ~0.5–0.73), making (VT − Vd) a small, noise-amplified number → CO2 predictions over-react to VT changes. Plus HB's resting-metabolism VCO2 estimate is off in non-resting ICU patients, and CO2 prediction over hours violates steady state (the fixed baseline MAE of 14 mmHg is already large — CO2 prediction is intrinsically noisy).
 **Decision:** Built as requested, but **HB is OPT-IN (`use_hb=False` default)** so it can't silently degrade the model; **manual measured dead space always wins**; anatomic stays the default. **Lesson: a more physiologically accurate dead space ≠ a better CO2 prediction.** Next: per-patient *learned* dead space (fit from the patient's own CO2 data), which optimizes for prediction directly.
 **Commit:** Phase 1 — HB dead space (built, opt-in; validation negative)
+
+## 2026-06-20 — Strategic: the PEEP problem is the hard core (Ahmed's domain insight)
+**Insight (Ahmed):** PEEP response is heterogeneous (MP rises with PEEP in some patients, falls in others); R/I is impractical (needs a bedside maneuver) AND incomplete (doesn't say how *much* PEEP). 
+**Cross-check:** matches our demo (heterogeneous compliance response; our β is a population average) and the literature (no bedside method cleanly predicts individual recruitability — EIT/esophageal/mechanics disagree; Ann Intensive Care 2024). 
+**Options recorded in `_Research_Agenda`:** A) PEEP-humility (optimize VT/RR, hold PEEP — drops R/I); B) learn the patient's own PEEP response from charted history; C) closed-loop small test-step; D) EIT/esophageal (future). Standing rule: never raise PEEP just for compliance (ART). 
+**Decision:** pending Ahmed's pick of direction. **Strong candidate = A as default + B when history exists.**
+**Sources:** Ann Intensive Care 2024 (bedside PEEP methods vs recruitability); ART JAMA 2017.
+**Commit:** Phase 1 — PEEP-problem design direction
