@@ -93,3 +93,14 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Decision:** Two new design-safety flags (permissive-mode ICP gate; recruitment/PEEP from part 1) + driving-pressure-as-target. Next gas-side experiment should test a physiological dead-space estimate. Every core theory now graded in `_Literature_Validation.md`.
 **Sources:** alveolar-ventilation physiology; Nuckton NEJM 2002; permissive-hypercapnia reviews; expiratory-time-constant reviews; Costa AJRCCM 2021.
 **Commit:** Phase 1 — literature validation part 2
+
+## 2026-06-20 — Searching the literature for a dead-space SOLUTION
+**Question:** How do we estimate *physiological* dead space at the bedside, with the data we have (no volumetric capnography)?
+**Method:** Literature search for bedside dead-space estimators + checked the demo for EtCO₂.
+**Result — three candidates:**
+1. **Ventilatory Ratio (VR)** — needs only VT, RR, PaCO₂, PBW (all in MIMIC). Validated, mortality-predictive. Simplest.
+2. **Harris–Benedict estimated VD/VT** (Beitler 2015) — unbiased vs measured (0.59 vs 0.60; ±0.10 in 70%), gives a directly-usable fraction; needs age/sex/weight/PaCO₂/MV (all available). Best accuracy.
+3. **EtCO₂ AVDSf** = (PaCO₂−EtCO₂)/PaCO₂ — captures alveolar dead space + real-time (ABG-lag bonus), but EtCO₂ sparse in demo (202 vs 623 PaCO₂ rows). Add-on, not backbone.
+**Decision:** recommend building **HB-estimated VD/VT as the backbone** (accuracy + usable fraction) with **VR as a simple cross-check**, then validate by CO₂/pH shadow test vs the anatomic-2.2-mL/kg baseline on held-out patients. EtCO₂/AVDSf later for real-time. Recorded as candidate fixes in `_Research_Agenda` Q3.
+**Sources:** Sinha (ventilatory ratio); Beitler CCM 2015 (estimated VD/VT); Yang/Morales (EtCO₂ AVDSf).
+**Commit:** Phase 1 — dead-space solution scouting

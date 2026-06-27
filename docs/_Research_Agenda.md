@@ -25,6 +25,11 @@
 - **Test:** predict PaCO₂/pH after a settings change vs the next ABG in MIMIC.
 - **Fix if wrong:** better dead-space estimate; consider **EtCO₂ as a real-time proxy** (solves the "ABG lag" problem).
 - **LITERATURE (2026-06-20):** the inverse CO₂↔alveolar-ventilation rule is standard physiology (valid). But our **anatomic 2.2 mL/kg dead space badly underestimates physiological dead space** (ARDS Vd/Vt 0.5–0.7; Nuckton NEJM 2002) → likely the main CO₂/pH error. Fix = ventilatory-ratio-based physiological dead space. See `_Literature_Validation` T9.
+- **Candidate fixes (papers, 2026-06-20):**
+  1. **Ventilatory Ratio (VR)** = (measured minute ventilation × PaCO₂) ÷ (PBW×100 × 37.5). Needs only VT, RR, PaCO₂, PBW — all in MIMIC. Validated, mortality-predictive (Sinha). ★ simplest.
+  2. **Harris–Benedict estimated VD/VT** (Beitler, Crit Care Med 2015): estimate CO₂ production from the Harris–Benedict energy equation, back-out VD/VT via the Enghoff–Bohr rearrangement. **Unbiased** (0.59 vs 0.60 measured; within ±0.10 in 70%). Needs age/sex/weight/PaCO₂/minute-ventilation — all available. ★ best accuracy; gives a directly-usable fraction.
+  3. **EtCO₂ alveolar dead-space fraction** AVDSf = (PaCO₂ − EtCO₂) ÷ PaCO₂ (or Frankenfield eq.). Captures alveolar dead space **and is real-time** (also tackles the ABG-lag goal) — but EtCO₂ is sparse in MIMIC (demo: 202 rows). Partial-coverage add-on.
+- **Plan:** replace fixed 2.2 mL/kg with a per-patient physiological dead space (HB or VR), then re-run a CO₂/pH shadow test (predict the next ABG after a settings change) and compare error vs the anatomic baseline on held-out patients — same method as the PEEP win.
 
 ### Q4 — Are the safety limits the right ones?
 - Plateau ≤30, VT 4–8 mL/kg are well-cited. **Driving pressure** (Amato) is *not yet* an explicit objective/limit — should it be? The manuscript shows MP harm with no safe floor, so should the score weight driving pressure too?
