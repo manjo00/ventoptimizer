@@ -143,3 +143,11 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Implication (important — reshapes the value proposition):** the SAFE knob (VT↔RR at constant ventilation) barely moves MP. Real MP reduction must come from **(a) permissive hypercapnia** (accept higher CO2 → less ventilation → lower MP; the prototype's actual main lever), or **(b) PEEP / driving pressure** (the parked hard problem).
 **Decision:** next solvable experiment = quantify MP savings from **permissive hypercapnia** (reduce ventilation to a pH floor), where the achievable savings actually are — with the raised-ICP contraindication gate.
 **Commit:** Phase 1 — MP-savings via VT/RR redistribution (near-zero)
+
+## 2026-09-27 — Idea (Ahmed): PEEP via transpulmonary-pressure target from limited data
+**Idea:** set PEEP by transpulmonary pressure (target end-expiratory ≈ 0) — a *dose*, which R/I can't give — and derive it from limited data.
+**Evidence checked (Q1):** EPVent-1 (Talmor NEJM 2008) positive for oxygenation; **EPVent-2 (Beitler JAMA 2019) negative** for mortality/VFDs vs empirical high PEEP; AJRCCM 2021 reanalysis — mortality lowest at transpulmonary ≈ 0, benefit only in less-sick patients. So principle sound, balloon strategy unproven.
+**Limited-data lead:** transpulmonary normally needs an esophageal balloon (not in MIMIC), BUT CVP swings may surrogate pleural pressure (J Clin Monit Comput 2024); CVP is routinely charted (likely in MIMIC) → a no-balloon route that is passively recorded and potentially MIMIC-validatable. `[low-strength — one small study]`
+**Decision:** recorded as PEEP **Option E** in `_Research_Agenda` (PEEP stays parked). Strong candidate for when we resume — check CVP in the data, test the estimate, quantify MP impact.
+**Sources:** EPVent-2 (JAMA 2019); reanalysis (AJRCCM 2021); Talmor (NEJM 2008); CVP-surrogate (J Clin Monit Comput 2024).
+**Commit:** docs — PEEP Option E (transpulmonary target + CVP surrogate)
