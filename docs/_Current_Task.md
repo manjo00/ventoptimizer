@@ -1,27 +1,32 @@
-# Current Task — Phase 1: solvable wins (PEEP parked)
+# Current Task — THE CORE GOAL: solve PEEP (math-only, recorded data)
 
-**Date:** 2026-06-20
-**Phase:** 1 (Model accuracy)
+**Date:** 2026-09-27
+**Phase:** 1 (now centered on the PEEP goal)
 **Status:** in progress
 
-## Decision
-The hard PEEP / recruitment problem is **PARKED** (Ahmed) — finish the solvable items first, return to it later. (Options A–D recorded in `_Research_Agenda` → "The PEEP problem".)
+## The goal (see CLAUDE.md → THE CORE GOAL)
+The project can't proceed without solving PEEP, **math-only on pre-recorded data**:
+1. **Choose the highest SAFE PEEP** — recruit/open the lung without over-stretching it.
+2. **Predict how a PEEP change alters COMPLIANCE** → compute the resulting Mechanical Power.
+Scope = a prototype on recorded datasets; live-patient testing is a possible future, not now.
 
-## Solvable focus (in order)
-1. ✅ **DONE — MP savings from VT↔RR redistribution: near-zero.** On 3,077 real snapshots, median **0.1 J/min** savable; only 7.6% could save ≥1. At constant CO₂ clearance the *safe* knob barely moves power. (`_Research_Log`.)
-2. ⭐ **NOW — MP savings from permissive hypercapnia** (the real lever): allow CO₂ to rise to a pH floor → reduce ventilation → measure the MP drop, on real patients. (With the raised-ICP contraindication gate.)
-   - **Note — manual limit:** include a **practitioner-set, patient-specific pH/CO₂ limit** (from their knowledge of the case) that overrides the default; the tool uses the **stricter** of the manual limit and the evidence-based floor.
-3. **Driving pressure as an explicit target/output** (Costa 2021, Amato 2015).
-4. Per-patient *learned* dead space (revisit; CO₂ prediction is noisy → lower yield).
+## Immediate next steps
+1. **Define the required-variable list** for the PEEP math + confirm a dataset (start: MIMIC-IV) covers it. (`_Research_Agenda` → "The PEEP problem" has the draft list + the pleural-signal gap.)
+2. **Prototype sub-problem 2** (PEEP → compliance → MP): build on the 28% population baseline + the **183 demo PEEP changes**; push toward per-patient prediction. No-balloon lever: elastance-ratio lung stress from Pplat/PEEP/VT.
+3. **Sub-problem 1** (highest safe PEEP): overdistension ceiling (plateau / elastance lung-stress) + oxygenation response.
 
-## Validated so far (Phase 1)
-- VT/RR pressure prediction is GOOD (plateau MAE 2.68 for VT changes); PEEP changes are the unreliable part.
-- PEEP-aware compliance: 28% prediction win (population-average; individual PEEP response = the parked hard problem).
-- Dead space: HB built (opt-in; worsened CO₂ prediction); manual override always wins.
+## Guardrails
+- Compliance-guided PEEP ≈ the **ART** strategy that *increased* mortality → frame as **prediction/prototype**, not clinical titration (`_Literature_Validation` T7). Prefer Q1 evidence; label strength.
+- Never push PEEP up just to chase compliance. Permissive mode needs a raised-ICP gate.
+
+## Validated so far
+- VT/RR pressure prediction GOOD (plateau MAE 2.68 for VT changes); **PEEP changes unreliable (MAE 4.80) = the crux.**
+- PEEP-aware compliance: **28%** prediction win (population avg; individual = the hard part).
+- MP savings from VT↔RR redistribution ≈ **0** → PEEP (+ permissive hypercapnia) are the real levers.
 - Every theory paper-validated (`_Literature_Validation.md`).
 
-## Open with Ahmed
-- When ready: run `validate_mimic.py` on the **full MIMIC-IV** locally; paste aggregates.
+## Secondary (after PEEP)
+- Permissive-hypercapnia MP lever (+ manual practitioner pH/CO₂ limit), driving pressure as target, per-patient dead space.
 
-## Noticed (not fixing now)
-- 🚩 Optimizer must never push PEEP up just for compliance (ART). 🚩 Permissive mode needs a raised-ICP gate. (See `_Literature_Validation`.)
+## Open with Ahmed
+- When ready: run `validate_mimic.py` on full MIMIC-IV locally; paste aggregates.

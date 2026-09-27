@@ -9,6 +9,22 @@ The evidence that minimizing Mechanical Power is the right goal comes from Ahmed
 
 ---
 
+## 🎯 THE CORE GOAL — never forget this (the whole point of the project)
+
+The project **cannot succeed without solving the PEEP problem.** This is the north star. Using **math on routinely-recorded data only** — no bedside maneuvers, no esophageal balloon, no special equipment — the tool must:
+
+1. **Choose the highest SAFE PEEP** — the most PEEP that opens/recruits the lung **without over-stretching or damaging it** (respect overdistension: plateau / transpulmonary-stress ceilings and the ART lesson).
+2. **Predict how that PEEP change alters COMPLIANCE**, so we can compute the resulting **Mechanical Power** (new compliance → new plateau & driving pressure → new MP).
+
+**Hard constraints — do not drift from these:**
+- **Math-only, on PRE-RECORDED data.** Every step must be computable from values a dataset already contains. → A chosen dataset **must carry every input the math needs**; define that required-variable list and confirm coverage *before* committing to a dataset (`docs/_Research_Agenda.md` → "The PEEP problem").
+- **Scope = a prototype on recorded datasets.** Live-patient testing is a *possible future*, not now.
+- **Honesty guardrail:** using compliance to pick "best PEEP" sits close to compliance-guided titration, which the **ART trial showed can *increase* mortality**. Frame results as **prediction / prototype**, keep the *prediction ≠ clinical titration* rule (`docs/_Literature_Validation.md` T7), and label evidence strength (prefer Q1).
+
+Everything else (CO₂ / permissive-hypercapnia lever, dead space, VT/RR) is **secondary** to this goal.
+
+---
+
 ## 🔴 THREE NON-NEGOTIABLES
 
 ### 1. 🧑‍🏫 Teaching mode — Ahmed is NOT a programmer

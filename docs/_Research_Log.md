@@ -151,3 +151,8 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Decision:** recorded as PEEP **Option E** in `_Research_Agenda` (PEEP stays parked). Strong candidate for when we resume — check CVP in the data, test the estimate, quantify MP impact.
 **Sources:** EPVent-2 (JAMA 2019); reanalysis (AJRCCM 2021); Talmor (NEJM 2008); CVP-surrogate (J Clin Monit Comput 2024).
 **Commit:** docs — PEEP Option E (transpulmonary target + CVP surrogate)
+
+## 2026-09-27 — PIVOT: PEEP is the core goal (un-parked); math-only on recorded data
+**Decision (Ahmed):** the project can't proceed without solving PEEP. Two sub-problems, **math-only, on pre-recorded datasets:** (1) choose the highest *safe* PEEP (no overdistension); (2) predict the PEEP→compliance change to compute MP. A dataset **must carry every value the math needs**. Scope = prototype on recorded data; live-patient testing is a possible future, not now.
+**Actions:** enshrined in `CLAUDE.md` → THE CORE GOAL; un-parked in `_Research_Agenda` + added the required-input list & the pleural-signal gap; refocused `_Current_Task` on the two PEEP sub-problems; CO₂/dead-space demoted to secondary.
+**Commit:** docs — enshrine PEEP as THE CORE GOAL in CLAUDE.md

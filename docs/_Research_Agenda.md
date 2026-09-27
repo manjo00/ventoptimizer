@@ -67,7 +67,9 @@
   - **Databases with vent + CVP + mortality:** **MIMIC-IV already has all three** (vent + spot CVP 220074 + mortality) — and a paper already linked CVP + ventilation + mortality in MIMIC-IV (*Crit Care Med 2022*). Higher-resolution CVP (toward the swing): **HiRID** (2-min resolution) or the **MIMIC-IV Waveform** DB; **AmsterdamUMCdb** / **eICU** also qualify. → **no new database strictly needed** for the spot-CVP / elastance work.
 - **Standing rule:** never push PEEP up just to chase compliance (ART). See `_Literature_Validation` T7.
 
-**Decision:** **PARKED for now** (Ahmed, 2026-06-20) — finish the solvable items first, then return to this hard problem. Options A–D above are ready to pick up.
+**Decision (2026-09-27): UN-PARKED — this IS the core goal** (see CLAUDE.md → THE CORE GOAL). The project can't proceed without it. Two sub-problems, **math-only on pre-recorded data**: **(1) choose the highest SAFE PEEP** (recruit without overdistension), **(2) predict the PEEP→compliance change** to compute Mechanical Power. Options above (esp. E + the elastance methods) feed this.
+
+**Required math inputs — a dataset MUST have all of these:** per ventilated timepoint — VT, RR, PEEP, plateau pressure (Pplat), peak pressure; **paired PEEP changes** with Pplat (the compliance response); oxygenation (PaO₂/FiO₂ or SpO₂/FiO₂); demographics (age/sex/height/weight → PBW); mortality/outcome (to validate). **Gap:** an *absolute* pleural/transpulmonary reference for the *collapse* target (CVP swing/waveform or esophageal) — MIMIC clinical has only **spot** CVP. **MIMIC-IV covers everything except that high-resolution pleural signal**; the elastance-ratio method (`(Pplat−PEEP)×0.7`) gives the overdistension side with no extra data.
 
 ## The validation loop (the Phase 1 engine of progress)
 1. **Shadow test:** pull real ventilated MIMIC-IV patients (`validate_mimic.py`).
