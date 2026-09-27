@@ -71,6 +71,14 @@
 
 **Required math inputs — a dataset MUST have all of these:** per ventilated timepoint — VT, RR, PEEP, plateau pressure (Pplat), peak pressure; **paired PEEP changes** with Pplat (the compliance response); oxygenation (PaO₂/FiO₂ or SpO₂/FiO₂); demographics (age/sex/height/weight → PBW); mortality/outcome (to validate). **Gap:** an *absolute* pleural/transpulmonary reference for the *collapse* target (CVP swing/waveform or esophageal) — MIMIC clinical has only **spot** CVP. **MIMIC-IV covers everything except that high-resolution pleural signal**; the elastance-ratio method (`(Pplat−PEEP)×0.7`) gives the overdistension side with no extra data.
 
+### ⚠ PEEP: the objective-function problem (critical, 2026-09-27)
+Stress-testing the core hypothesis ("recruitable → ↑PEEP → ↑compliance → ↓MP") against Q1 evidence exposes a fork we must resolve **before building**:
+- **Absolute mechanical power RISES with PEEP** (~+1 J/min per cmH₂O), *regardless* of recruitability (bedside PEEP-MP post hoc, PMC13515540; *Lung recruitability determines the impact of PEEP on mechanical power*, Crit Care 2026). So minimizing *absolute* MP over PEEP → the tool lowers PEEP → **derecruits** (wrong).
+- Recruitment's protective effect is on **power / strain PER AERATED LUNG UNIT** — that **decreases** when PEEP recruits (energy spreads over more open lung). Recruitability (R/I) sets the *sign* of the per-unit effect (Crit Care 2026, Q1).
+- The relationship is **U-shaped** — an optimal PEEP (recruitment benefit vs overdistension), not "more is better" (Intensive Care Med 2025).
+- **The objective must be one of:** (a) minimize the **tidal/dynamic (driving-pressure) power** `∝ RR × VT²/compliance` — recruitment ↑compliance → ↓driving pressure → ↓this power → hypothesis HOLDS (and static PEEP energy, arguably stored not cyclically dissipated, is excluded); (b) minimize **MP normalized to aerated lung / strain**; or (c) minimize **absolute MP subject to maintaining recruitment/oxygenation**.
+- **Corrected hypothesis:** *In recruitable lungs, PEEP up to an optimum improves compliance and lowers the tidal / per-aerated-unit mechanical load (strain) — even though it raises the absolute delivered power; beyond the optimum, overdistension worsens both.*
+
 ## The validation loop (the Phase 1 engine of progress)
 1. **Shadow test:** pull real ventilated MIMIC-IV patients (`validate_mimic.py`).
 2. For each, feed their state into `physiology.predict()`.

@@ -156,3 +156,11 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Decision (Ahmed):** the project can't proceed without solving PEEP. Two sub-problems, **math-only, on pre-recorded datasets:** (1) choose the highest *safe* PEEP (no overdistension); (2) predict the PEEP→compliance change to compute MP. A dataset **must carry every value the math needs**. Scope = prototype on recorded data; live-patient testing is a possible future, not now.
 **Actions:** enshrined in `CLAUDE.md` → THE CORE GOAL; un-parked in `_Research_Agenda` + added the required-input list & the pleural-signal gap; refocused `_Current_Task` on the two PEEP sub-problems; CO₂/dead-space demoted to secondary.
 **Commit:** docs — enshrine PEEP as THE CORE GOAL in CLAUDE.md
+
+## 2026-09-27 — Stress-testing THE hypothesis: absolute MP vs per-unit MP (critical)
+**Question (Ahmed):** Is "recruitable → ↑PEEP → ↑compliance → ↓mechanical power" correct?
+**Finding (Q1):** **Partly wrong as stated.** *Absolute* MP **RISES** with PEEP (~+1 J/min per cmH₂O), even in recruitable lungs (*Lung recruitability determines the impact of PEEP on mechanical power*, Crit Care 2026; bedside PEEP-MP post hoc PMC13515540). The protective effect is on **power/strain per AERATED lung unit**, which recruitment lowers; recruitability (R/I) sets the sign; the PEEP↔protection relationship is **U-shaped** (optimal PEEP; Intensive Care Med 2025).
+**Implication (big):** minimizing *absolute* MP over PEEP would **derecruit** → the project's objective must be redefined — (a) tidal/dynamic (driving-pressure) power, (b) per-aerated-unit/strain, or (c) absolute-MP-with-recruitment-constraint. The user's instinct is right for the *tidal/per-unit* power, wrong for *absolute* MP.
+**Actions:** added the ⚠ objective-function caveat to CLAUDE.md → THE CORE GOAL, and the full "PEEP: the objective-function problem" entry + corrected hypothesis to `_Research_Agenda`.
+**Sources:** Crit Care 2026 (recruitability & PEEP MP); bedside PEEP-MP post hoc (PMC13515540); Intensive Care Med 2025 (U-shaped PEEP).
+**Commit:** docs — objective-function caveat (absolute vs per-unit MP)
