@@ -164,3 +164,8 @@ only — NEVER patient data** (see CLAUDE.md governance). Newest at the bottom.
 **Actions:** added the ⚠ objective-function caveat to CLAUDE.md → THE CORE GOAL, and the full "PEEP: the objective-function problem" entry + corrected hypothesis to `_Research_Agenda`.
 **Sources:** Crit Care 2026 (recruitability & PEEP MP); bedside PEEP-MP post hoc (PMC13515540); Intensive Care Med 2025 (U-shaped PEEP).
 **Commit:** docs — objective-function caveat (absolute vs per-unit MP)
+
+## 2026-09-27 — DECISION: objective = tidal/driving-pressure MP (compare by same; report absolute)
+**Decision (Ahmed):** the tool minimizes, and compares optimized vs un-optimized by, the **tidal / driving-pressure mechanical power** (breath energy; excludes the static PEEP baseline). Absolute MP is reported alongside for transparency + the manuscript link. Same metric on both sides → recruitment shows as a win; comparing by absolute MP would penalize correct recruitment.
+**Actions:** locked in CLAUDE.md → THE CORE GOAL (objective-function caveat) and `_Research_Agenda` (option (a) chosen); noted in `_Current_Task`.
+**Commit:** docs — lock objective (tidal/driving-pressure MP)

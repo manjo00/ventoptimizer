@@ -23,7 +23,7 @@ The project **cannot succeed without solving the PEEP problem.** This is the nor
 
 Everything else (CO₂ / permissive-hypercapnia lever, dead space, VT/RR) is **secondary** to this goal.
 
-**⚠ Objective-function caveat (critical — 2026-09-27):** *absolute* mechanical power **RISES** with PEEP (~+1 J/min per cmH₂O), even in recruitable lungs — so minimizing *absolute* MP would push PEEP **down** (derecruit), the opposite of protective. Recruitment's benefit is on the **power/strain PER AERATED LUNG UNIT** and on the **tidal/driving-pressure** power, which recruitment lowers. → **Before building, decide WHICH power we minimize** (tidal/dynamic, or per-unit-normalized, or absolute-MP-with-a-recruitment-constraint) or the tool optimizes toward derecruitment. See `docs/_Research_Agenda.md` → "PEEP: the objective-function problem".
+**⚠ Objective-function caveat (critical — 2026-09-27):** *absolute* mechanical power **RISES** with PEEP (~+1 J/min per cmH₂O), even in recruitable lungs — so minimizing *absolute* MP would push PEEP **down** (derecruit), the opposite of protective. Recruitment's benefit is on the **power/strain PER AERATED LUNG UNIT** and on the **tidal/driving-pressure** power, which recruitment lowers. → **DECISION (locked 2026-09-27): the tool minimizes — and compares optimized vs un-optimized by — the TIDAL / driving-pressure mechanical power** (the energy of the breath itself, not the static PEEP baseline). **Absolute MP is reported alongside** for transparency and to tie back to the manuscript. Same metric on both sides = self-consistent (recruitment always shows as a win); **never compare by absolute MP** — it can penalize correct recruitment. Details: `docs/_Research_Agenda.md` → "PEEP: the objective-function problem".
 
 ---
 

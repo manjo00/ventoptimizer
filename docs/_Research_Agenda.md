@@ -77,6 +77,7 @@ Stress-testing the core hypothesis ("recruitable → ↑PEEP → ↑compliance �
 - Recruitment's protective effect is on **power / strain PER AERATED LUNG UNIT** — that **decreases** when PEEP recruits (energy spreads over more open lung). Recruitability (R/I) sets the *sign* of the per-unit effect (Crit Care 2026, Q1).
 - The relationship is **U-shaped** — an optimal PEEP (recruitment benefit vs overdistension), not "more is better" (Intensive Care Med 2025).
 - **The objective must be one of:** (a) minimize the **tidal/dynamic (driving-pressure) power** `∝ RR × VT²/compliance` — recruitment ↑compliance → ↓driving pressure → ↓this power → hypothesis HOLDS (and static PEEP energy, arguably stored not cyclically dissipated, is excluded); (b) minimize **MP normalized to aerated lung / strain**; or (c) minimize **absolute MP subject to maintaining recruitment/oxygenation**.
+- **✅ DECIDED (2026-09-27):** option **(a)** — the tool **minimizes and compares optimized-vs-un-optimized by the tidal / driving-pressure mechanical power**; absolute MP is reported alongside for transparency. Same metric on both sides → self-consistent (recruitment shows as a win); **never compare by absolute MP** (it penalizes correct recruitment).
 - **Corrected hypothesis:** *In recruitable lungs, PEEP up to an optimum improves compliance and lowers the tidal / per-aerated-unit mechanical load (strain) — even though it raises the absolute delivered power; beyond the optimum, overdistension worsens both.*
 
 ## The validation loop (the Phase 1 engine of progress)

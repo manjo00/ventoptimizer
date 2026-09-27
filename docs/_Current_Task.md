@@ -10,6 +10,8 @@ The project can't proceed without solving PEEP, **math-only on pre-recorded data
 2. **Predict how a PEEP change alters COMPLIANCE** → compute the resulting Mechanical Power.
 Scope = a prototype on recorded datasets; live-patient testing is a possible future, not now.
 
+**Objective metric (locked 2026-09-27):** minimize **and** compare optimized-vs-baseline by the **tidal / driving-pressure mechanical power** (breath energy, not the static PEEP baseline); report absolute MP alongside for transparency. Never compare by absolute MP.
+
 ## Immediate next steps
 1. **Define the required-variable list** for the PEEP math + confirm a dataset (start: MIMIC-IV) covers it. (`_Research_Agenda` → "The PEEP problem" has the draft list + the pleural-signal gap.)
 2. **Prototype sub-problem 2** (PEEP → compliance → MP): build on the 28% population baseline + the **183 demo PEEP changes**; push toward per-patient prediction. No-balloon lever: elastance-ratio lung stress from Pplat/PEEP/VT.
