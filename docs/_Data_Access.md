@@ -17,7 +17,7 @@ AI / online services. So the data stays on **your** machine; Claude only ever se
 2. Download the hourly dataset used in the manuscript: **"A Temporal Dataset for Respiratory Support in Critically Ill Patients" (v1.1.0)** from PhysioNet (plus MIMIC-IV v3.1 if outcome links are needed).
 3. Save the files in a local folder **outside this git repo** (we never commit patient data).
 4. Paste Claude only the **column names / data dictionary** (just the field-name list) so the loader can map them. Field names are not patient data → safe.
-5. Run locally: `python engine/validate_mimic.py <path-to-your-data>`. Paste back only the printed **aggregate results**. Any plots save locally for your eyes only.
+5. Run locally, in the order and with the commands given in **`docs/_Analysis_Plan_FullMIMIC.md` §12** (`check_coverage.py`, `validate_mimic.py`, `peep_response_pilot.py`, `state_predictor.py`, each pointed at the folder that holds `icu/` and `hosp/`). Paste back only the printed **aggregate results**. Any plots save locally for your eyes only.
 
 ## Safe vs not-safe to share with Claude
 | ✅ Safe | 🚫 Never |

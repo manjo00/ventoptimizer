@@ -23,6 +23,8 @@ The project **cannot succeed without solving the PEEP problem.** This is the nor
 
 Everything else (CO₂ / permissive-hypercapnia lever, dead space, VT/RR) is **secondary** to this goal.
 
+**Design decision (2026-09-28, Ahmed — option (c)):** sub-problem 2 is attacked with a **state-predictor model + uncertainty range** on full MIMIC-IV (pre-specified plan: `docs/_Analysis_Plan_FullMIMIC.md`, code: `engine/state_predictor.py`), and a **small reversible test step** (option C) as the safety net — primary if the model fails its pre-set criterion. Never a population recruitment constant (retracted 2026-09-28), never a compliance prediction without its range.
+
 **⚠ Objective-function caveat (critical — 2026-09-27):** *absolute* mechanical power **RISES** with PEEP (~+1 J/min per cmH₂O), even in recruitable lungs — so minimizing *absolute* MP would push PEEP **down** (derecruit), the opposite of protective. Recruitment's benefit is on the **power/strain PER AERATED LUNG UNIT** and on the **tidal/driving-pressure** power, which recruitment lowers. → **DECISION (locked 2026-09-27): the tool minimizes — and compares optimized vs un-optimized by — the TIDAL / driving-pressure mechanical power** (the energy of the breath itself, not the static PEEP baseline). **Absolute MP is reported alongside** for transparency and to tie back to the manuscript. Same metric on both sides = self-consistent (recruitment always shows as a win); **never compare by absolute MP** — it can penalize correct recruitment. Details: `docs/_Research_Agenda.md` → "PEEP: the objective-function problem".
 
 ---
@@ -106,6 +108,7 @@ The whole point of this setup is to NOT re-read everything. Match the task to th
 | Data shapes (inputs/outputs/limits) | `docs/_Schema.md` |
 | The MIMIC data field codes (itemids) | `docs/_Data_Dictionary.md` |
 | Which variables the PEEP math needs + dataset coverage | `docs/_Required_Variables.md` |
+| The full-MIMIC analysis plan (frozen hypotheses, what Ahmed runs, decision rules) | `docs/_Analysis_Plan_FullMIMIC.md` |
 | How pieces connect | `docs/_Architecture.md` |
 | What to do next / open questions | `docs/_Research_Agenda.md` + `Roadmap.md` |
 | Rebuilding context after `/compact` / a new session | `docs/_Compact.md` (then `_Current_Task.md`) |
@@ -130,8 +133,9 @@ VentOptimizer/
 │   ├── _Evidence_Base.md  ├── _Research_Agenda.md
 │   ├── _Current_Task.md   ├── _Task_History.md
 │   ├── _Required_Variables.md ← the PEEP-math input list + dataset coverage verdict
+│   ├── _Analysis_Plan_FullMIMIC.md ← the frozen full-MIMIC analysis plan (step 2b)
 │   └── _Compact.md        ← one-page state; read first after /compact
-├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · check_coverage.py · peep_response_pilot.py · README.md
+├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · check_coverage.py · peep_response_pilot.py · state_predictor.py · README.md
 ├── app/                   ← ventoptimizer.html (v2.4 prototype)
 ├── reference/             ← READ-ONLY source: Manuscript_V3.pdf, Research Poster.pdf, Mega-Prompt Context.md
 └── poster_day/            ← parked poster deliverables (unrelated to the engine)
