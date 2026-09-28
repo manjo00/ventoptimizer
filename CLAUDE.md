@@ -131,7 +131,7 @@ VentOptimizer/
 │   ├── _Current_Task.md   ├── _Task_History.md
 │   ├── _Required_Variables.md ← the PEEP-math input list + dataset coverage verdict
 │   └── _Compact.md        ← one-page state; read first after /compact
-├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · check_coverage.py · README.md
+├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · check_coverage.py · peep_response_pilot.py · README.md
 ├── app/                   ← ventoptimizer.html (v2.4 prototype)
 ├── reference/             ← READ-ONLY source: Manuscript_V3.pdf, Research Poster.pdf, Mega-Prompt Context.md
 └── poster_day/            ← parked poster deliverables (unrelated to the engine)
