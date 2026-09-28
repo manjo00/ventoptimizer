@@ -105,6 +105,7 @@ The whole point of this setup is to NOT re-read everything. Match the task to th
 | Whether a theory is paper-proven (and how strongly) | `docs/_Literature_Validation.md` |
 | Data shapes (inputs/outputs/limits) | `docs/_Schema.md` |
 | The MIMIC data field codes (itemids) | `docs/_Data_Dictionary.md` |
+| Which variables the PEEP math needs + dataset coverage | `docs/_Required_Variables.md` |
 | How pieces connect | `docs/_Architecture.md` |
 | What to do next / open questions | `docs/_Research_Agenda.md` + `Roadmap.md` |
 | Rebuilding context after `/compact` / a new session | `docs/_Compact.md` (then `_Current_Task.md`) |
@@ -128,8 +129,9 @@ VentOptimizer/
 │   ├── _Architecture.md   ├── _Clinical_Logic.md  ├── _Schema.md
 │   ├── _Evidence_Base.md  ├── _Research_Agenda.md
 │   ├── _Current_Task.md   ├── _Task_History.md
+│   ├── _Required_Variables.md ← the PEEP-math input list + dataset coverage verdict
 │   └── _Compact.md        ← one-page state; read first after /compact
-├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · README.md
+├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · check_coverage.py · README.md
 ├── app/                   ← ventoptimizer.html (v2.4 prototype)
 ├── reference/             ← READ-ONLY source: Manuscript_V3.pdf, Research Poster.pdf, Mega-Prompt Context.md
 └── poster_day/            ← parked poster deliverables (unrelated to the engine)

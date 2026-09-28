@@ -14,6 +14,7 @@ app in `app/` is just a demo face; this is what we trust and improve.)
 | `physiology.py` | The "what would happen if…" calculator. Predicts pressures, Mechanical Power, and pH for one setting. Does no choosing. |
 | `optimizer.py` | The chooser. Tries thousands of settings, drops unsafe ones, keeps the lowest-energy safe one, and explains why. |
 | `validate_mimic.py` | The accuracy checker (Phase 1). Replays real patients and compares predicted vs what actually happened. Currently a skeleton with fake demo data. |
+| `check_coverage.py` | The dataset checker. Opens a MIMIC-IV folder and reports, for every variable the PEEP math needs, how often it is present — plus how many PEEP changes are usable. Prints aggregate counts only. Run: `python engine/check_coverage.py --mimic <folder>` (the list it checks is explained in `docs/_Required_Variables.md`). |
 
 ## How to run them
 Open a terminal **in the project folder** and type:

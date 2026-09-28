@@ -27,7 +27,7 @@ MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
 - `[N1]` Chen L, Del Sorbo L, Grieco DL, et al. *Potential for Lung Recruitment Estimated by the Recruitment-to-Inflation Ratio in ARDS. A Clinical Trial.* Am J Respir Crit Care Med 2020;201(2):178–187.
 - The **R/I = 0.5 cut-off** (the cohort median) separates **low (≤0.5)** vs **high (>0.5)** recruitability. → our >0.5 "recruitable" rule is grounded.
 - ⚠️ **Was an `[ASSUMPTION]`:** our compliance formula `C_new = C × (1 + (R/I−0.5)×0.1×ΔPEEP)`. The `×0.1` was invented — Chen gives no PEEP→compliance equation.
-- **DATA UPDATE (demo, 2026-06-20):** measured a population recruitment slope **β ≈ 0.083 per cmH₂O** (compliance +40% when PEEP↑, −23% when PEEP↓); a `C×(1+β·ΔPEEP)` correction cut PEEP-change plateau error **28%** on held-out patients. So the `×0.1` magnitude is **data-supported (ballpark-correct)**, not arbitrary — confirm on full MIMIC-IV before changing production. See `_Research_Log`.
+- **DATA UPDATE (demo, 2026-06-20):** measured a population recruitment slope **β ≈ 0.083 per cmH₂O** (compliance +40% when PEEP↑, −23% when PEEP↓); a `C×(1+β·ΔPEEP)` correction cut PEEP-change plateau error **28%** on held-out patients. So the `×0.1` magnitude is **data-supported (ballpark-correct)**, not arbitrary — confirm on full MIMIC-IV before changing production. See `_Research_Log`. **⚠ 2026-09-28: SUSPECT — stale-plateau artifact (only 13% of those events had a plateau charted at the change); the `×0.1` is back to `[ASSUMPTION]` until the re-run on usable pairs.**
 - 🟥 **Boundary (ART trial, Cavalcanti JAMA 2017; Crit Care 2022 PMID 35918772):** a PEEP-induced compliance change is NOT a recruitment measure, and titrating PEEP to "best compliance" *increased* mortality. So our PEEP-aware compliance is for **plateau PREDICTION only** — it must never drive "raise PEEP for better compliance." See `_Literature_Validation.md` T7.
 
 ## Lung compliance is NONLINEAR (the model's biggest weakness)  `[N2]`
@@ -49,6 +49,11 @@ MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
 
 ## Oxygenation substitution (for validation)  `[E7] = ref 21`
 - SpO₂/FiO₂ is a validated stand-in for PaO₂/FiO₂ when no arterial gas is available — Pandharipande PP, et al. CCM 2009;37:1317–21.
+
+## PEEP-response predictors & the PEEP/FiO₂ tables  `[N6]` `[N7]` (added 2026-09-28 for the required-variable list)
+- `[N6]` Gattinoni L, et al. *Lung recruitment in patients with the acute respiratory distress syndrome.* NEJM 2006;354:1775–86. The recruitable lung fraction varied widely between patients (mean ≈13%) and **predicted the response to PEEP** (oxygenation, dead space, compliance). Used here only to justify **which recorded variables are candidate recruitability inputs** (baseline oxygenation, PaCO₂/dead space, compliance); no threshold taken from it. `[ASSUMPTION until re-checked in the Phase-1 literature pass: that the sicker-baseline ↔ more-recruitable direction holds outside CT-defined ARDS]`
+- `[N7]` Brower RG, et al. (ALVEOLI). *Higher versus lower PEEP in patients with ARDS.* NEJM 2004;351:327–36 — the empirical **higher-PEEP/FiO₂ table** (vs the ARDSNet 2000 lower-PEEP table `[E3]`); no mortality difference between tables. Role for us: the two tables bound the *conventional* PEEP range for a given FiO₂ — a sanity envelope, **not** a target.
+- **Hemodynamic guard for PEEP steps:** PEEP lowers venous return / raises right-ventricular afterload (standard physiology). Any numeric MAP / vasopressor threshold used as a guard is `[TO-CITE before use]` — do not put a number in code yet.
 
 ## Data source for validation  `[M]`
 - MIMIC-IV (v3.1) via the PhysioNet "Temporal Dataset for Respiratory Support" (v1.1.0). Credentialed; **local-only handling** (see `_Data_Access.md` + CLAUDE.md governance).

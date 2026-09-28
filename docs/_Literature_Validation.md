@@ -36,7 +36,7 @@ then large observational; then our own demo data (indicative, not proof).
 - **Verdict:** 🟦 supported + 🟧 our demo agrees.
 
 ### T7 — "Compliance shifts when PEEP changes (recruitment) — so account for it"  ⚠️ READ THE CAVEAT
-- **For PREDICTION (our use):** compliance does move with PEEP; correcting for it cut our plateau-prediction error **28%** on held-out demo patients. Direction matches the literature (e.g., COVID-ARDS compliance rose ~10% from PEEP 5→15).
+- **For PREDICTION (our use):** compliance does move with PEEP; correcting for it cut our plateau-prediction error **28%** on held-out demo patients. **⚠ 2026-09-28: that 28% is SUSPECT — most events used a forward-filled (stale) plateau; re-run pending (`_Research_Log`).** Direction matches the literature (e.g., COVID-ARDS compliance rose ~10% from PEEP 5→15).
 - **🟥 Critical caveat:** a PEEP-induced compliance change is **NOT a reliable measure of recruitment** and can mislead (Coppola/Chiumello group, Crit Care 2022, PMID 35918772 — changes "reflect almost exclusively lung over-inflation, not alveolar recruitment"). **Titrating PEEP to "best compliance" INCREASED mortality** in the **ART trial** (Cavalcanti, JAMA 2017: 28-day 55.3% vs 49.3% with low PEEP).
 - **Verdict:** 🟧 our correction is valid **only as a prediction/accuracy tool**. It must **not** be read as recruitment, and the optimizer must **not** push PEEP up to chase compliance — that contradicts RCT evidence.
 
