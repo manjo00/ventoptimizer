@@ -8,13 +8,23 @@ pressures, the Mechanical Power (energy to the lungs), and the blood pH.
 It does NOT choose settings — that's optimizer.py's job. This file only predicts.
 
 Every formula here is explained in docs/_Clinical_Logic.md (with citations in
-docs/_Evidence_Base.md). The section numbers (§1–§6) below match that file.
+docs/_Evidence_Base.md). The section numbers (§1–§8) below match that file.
+
+What changed on 2026-09-28 (after the research in docs/_Research_Log.md):
+  * Mechanical power now comes in three labelled numbers (§1): the Gattinoni plateau
+    form, the manuscript's peak-only surrogate, and the TIDAL part — the one we optimize.
+  * The old rule "compliance rises 10% per cmH2O of PEEP in a recruitable lung" is GONE.
+    On real measurements no such rule held, and a patient's own history did not predict
+    the next step either. The point estimate is now "compliance unchanged", and every
+    PEEP step carries a RANGE (§3) — a placeholder from the open demo until the full-MIMIC
+    state model replaces it (docs/_Analysis_Plan_FullMIMIC.md).
 
 Units: pressures in cmH2O, volumes in mL (litres where noted), rate in breaths/min.
 """
 
 import math
 from dataclasses import dataclass
+from typing import Optional, Tuple
 
 
 # ---------------------------------------------------------------------------
@@ -25,21 +35,22 @@ from dataclasses import dataclass
 @dataclass
 class PatientCase:
     pbw: float          # predicted body weight (kg)
-    pf_ratio: float     # oxygenation PaO2/FiO2 (lower = sicker lungs)
-    ri_index: float     # recruitment-to-inflation index, 0–1 (>0.5 = recruitable)
     base_paco2: float   # current arterial CO2 (mmHg)
     hco3: float         # bicarbonate (mmol/L)
     permissive: bool    # allow higher CO2 (pH floor 7.20 instead of 7.30)?
+    # --- optional context: shown to the clinician, but NONE of these change the math ---
+    pf_ratio: Optional[float] = None     # oxygenation PaO2/FiO2 (lower = sicker lungs)
+    ri_index: Optional[float] = None     # a MEASURED recruitment-to-inflation index (bedside maneuver) [N1]; >0.5 = recruitable
     # --- optional: enable the Harris–Benedict physiological dead space (else we fall back) ---
-    age: float = None             # years
-    sex: str = None               # "M" or "F"
-    height_cm: float = None       # height in cm
-    weight_kg: float = None       # actual weight (kg); falls back to PBW if missing
-    use_hb: bool = False          # opt-in Harris–Benedict dead space (OFF by default — our
-                                  # demo validation showed it WORSENED CO2 prediction; see _Research_Log)
+    age: Optional[float] = None          # years
+    sex: Optional[str] = None            # "M" or "F"
+    height_cm: Optional[float] = None    # height in cm
+    weight_kg: Optional[float] = None    # actual weight (kg); falls back to PBW if missing
+    use_hb: bool = False                 # opt-in Harris–Benedict dead space (OFF by default — our
+                                         # demo validation showed it WORSENED CO2 prediction; see _Research_Log)
     # --- optional MANUAL overrides (use a real measurement if you have one) ---
-    measured_deadspace_ml: float = None   # a measured dead space, in mL
-    measured_vd_vt: float = None          # a measured dead-space fraction, 0–1
+    measured_deadspace_ml: Optional[float] = None   # a measured dead space, in mL
+    measured_vd_vt: Optional[float] = None          # a measured dead-space fraction, 0–1
 
 
 @dataclass
@@ -49,6 +60,18 @@ class Baseline:
     peep: float     # current PEEP (cmH2O)
     pplat: float    # measured plateau pressure via inspiratory hold (cmH2O) — REQUIRED
     ppeak: float    # current peak pressure (cmH2O)
+    # --- the current STATE used by the safe-PEEP ceiling (engine/safe_peep.py); all optional ---
+    fio2: Optional[float] = None            # fraction (0.4) or percent (40)
+    spo2: Optional[float] = None            # %
+    pao2: Optional[float] = None            # mmHg
+    peep_total: Optional[float] = None      # measured total PEEP (set + auto-PEEP)
+    rr_spont: Optional[float] = None        # spontaneous breaths per minute (0 in a passive patient)
+    controlled_mode: bool = True
+    map_mmHg: Optional[float] = None        # mean arterial pressure
+    vasopressor_running: bool = False
+    icp: Optional[float] = None             # intracranial pressure, mmHg (if monitored)
+    chest_tube: bool = False
+    dpl_measured: Optional[float] = None    # measured transpulmonary driving pressure (esophageal balloon), if any
 
 
 @dataclass
@@ -59,20 +82,61 @@ class Mechanics:
     r_aw: float           # airway resistance (cmH2O per L/s)
     v_deadspace: float    # "wasted" volume that doesn't reach gas exchange (mL)
     base_valv: float      # baseline alveolar ventilation (mL/min)
-    base_mp: float        # baseline Mechanical Power (J/min)
+    base_mp: float        # baseline Mechanical Power, Gattinoni plateau form (J/min)      [E1]
+    base_mp_dyn: float    # baseline power, manuscript's peak-only surrogate (J/min)        [M][N8]
+    base_mp_tidal: float  # baseline TIDAL power — the part we optimize (J/min)
 
 
 @dataclass
 class Prediction:
-    mp: float          # Mechanical Power (J/min) — the thing we minimize
-    pplat: float       # predicted plateau pressure
-    driving_p: float   # driving pressure = Pplat − PEEP (lung stretch per breath)
-    ppeak: float       # predicted peak pressure
-    vt: float          # resulting tidal volume (mL)
-    ph: float          # predicted blood pH
-    paco2: float       # predicted CO2 (mmHg)
-    tau: float         # time constant (s) — how fast the lung empties
-    te: float          # expiratory time available (s)
+    mp: float                 # Mechanical Power, Gattinoni plateau form (J/min)            [E1]
+    mp_dyn: float             # the manuscript's peak-only surrogate (J/min)                 [M][N8]
+    mp_tidal: float           # TIDAL (driving-pressure) power — the number we minimize
+    mp_formula: str           # which absolute-power form was used
+    pplat: float              # predicted plateau pressure
+    driving_p: float          # driving pressure = Pplat − PEEP (lung stretch per breath)
+    ppeak: float              # predicted peak pressure
+    vt: float                 # resulting tidal volume (mL)
+    ph: float                 # predicted blood pH
+    paco2: float              # predicted CO2 (mmHg)
+    tau: float                # time constant (s) — how fast the lung empties
+    te: float                 # expiratory time available (s)
+    compliance: float         # compliance used for this prediction (mL/cmH2O)
+    # --- uncertainty when PEEP is changed (all three are (low, high) pairs) ---
+    compliance_range: Tuple[float, float]   # fractional change, e.g. (−0.07, +0.31) = −7% to +31%
+    pplat_range: Tuple[float, float]        # plateau if compliance lands at the high / low end
+    mp_tidal_range: Tuple[float, float]     # tidal power at those two ends
+
+
+# ---------------------------------------------------------------------------
+# §1 Mechanical power — three labelled numbers (decision 2026-09-28, _Evidence_Base [E1][N8])
+# ---------------------------------------------------------------------------
+MP_K = 0.098   # converts (breaths/min × L × cmH2O) into J/min — the constant in Gattinoni's equation [E1]
+
+
+def mp_gattinoni(rr, vt_ml, ppeak, pplat, peep):
+    """(a) Gattinoni's simplified equation — needs a plateau. [E1]"""
+    return MP_K * rr * (vt_ml / 1000.0) * (ppeak - 0.5 * (pplat - peep))
+
+
+def mp_dynamic(rr, vt_ml, ppeak, peep):
+    """(b) The peak-only surrogate used in Ahmed's manuscript and the big database studies. [M][N8]"""
+    return MP_K * rr * (vt_ml / 1000.0) * (ppeak - 0.5 * (ppeak - peep))
+
+
+def mp_tidal(rr, vt_ml, pplat, peep):
+    """The TIDAL (driving-pressure) part of (a): the energy of the breath itself,
+    0.098 × RR × VT × ½ΔP. This is the locked comparison metric (2026-09-27)."""
+    return MP_K * rr * (vt_ml / 1000.0) * 0.5 * (pplat - peep)
+
+
+def mechanical_power(rr, vt_ml, ppeak, pplat, peep):
+    """All three at once, with the rule: plateau form when a plateau exists, surrogate otherwise."""
+    dyn = mp_dynamic(rr, vt_ml, ppeak, peep)
+    if pplat is None:
+        return {"mp": dyn, "mp_dyn": dyn, "mp_tidal": None, "formula": "peak-only surrogate (no plateau charted) [M][N8]"}
+    return {"mp": mp_gattinoni(rr, vt_ml, ppeak, pplat, peep), "mp_dyn": dyn,
+            "mp_tidal": mp_tidal(rr, vt_ml, pplat, peep), "formula": "Gattinoni plateau form [E1]"}
 
 
 # ---------------------------------------------------------------------------
@@ -147,27 +211,44 @@ def baseline_mechanics(pt: PatientCase, base: Baseline) -> Mechanics:
     # §6 Alveolar ventilation = the part of breathing that actually clears CO2.
     base_valv = base.rr * (base.vt - v_deadspace)
 
-    # §1 Baseline Mechanical Power (the number we're trying to beat).
-    base_mp = 0.098 * base.rr * (base.vt / 1000.0) * (base.ppeak - 0.5 * driving_p_base)
+    # §1 Baseline power — the three labelled numbers we are trying to beat.
+    power = mechanical_power(base.rr, base.vt, base.ppeak, base.pplat, base.peep)
 
-    return Mechanics(c_stat_base, resistive_gap, r_aw, v_deadspace, base_valv, base_mp)
+    return Mechanics(c_stat_base, resistive_gap, r_aw, v_deadspace, base_valv,
+                     power["mp"], power["mp_dyn"], power["mp_tidal"])
 
 
 # ---------------------------------------------------------------------------
-# Step 2: how compliance changes when we change PEEP (§3 recruitment).
+# §3 How compliance responds to a PEEP change — the honest state of knowledge (2026-09-28)
+#
+# On real plateau measurements (docs/_Research_Log.md, steps 1b and 2a):
+#   * no population rule held (the recruitment slope's interval includes zero);
+#   * a patient's own previous step did not predict the next one;
+#   * "compliance unchanged" beat every alternative as a point estimate;
+#   * but the real spread across a step is wide (about 3× measurement noise).
+# So: point estimate = unchanged; every PEEP step carries a RANGE. The range below is a
+# PLACEHOLDER from the open demo (27 pairs) and is replaced by the full-MIMIC state model
+# once it passes its pre-set criterion (docs/_Analysis_Plan_FullMIMIC.md, H1).
 # ---------------------------------------------------------------------------
+RESPONSE_RANGE_PLACEHOLDER = {
+    "up":   (-0.074, +0.311),    # IQR of the compliance change when PEEP went UP   (demo, n = 18) [PLACEHOLDER]
+    "down": (-0.295, +0.351),    # IQR of the compliance change when PEEP went DOWN (demo, n = 9)  [PLACEHOLDER]
+}
+RESPONSE_RANGE_LABEL = "placeholder range from the open demo (27 pairs) — to be replaced by the full-MIMIC state model"
 
-def dynamic_compliance(c_base: float, ri_index: float, peep: float, base_peep: float) -> float:
-    """
-    If we RAISE PEEP in a recruitable lung (R/I > 0.5), collapsed lung opens up
-    and the lung gets more compliant (stretchier). If it's non-recruitable, the
-    opposite. NOTE: the 0.1 multiplier is an unproven assumption (see _Clinical_Logic §3).
-    """
-    delta_peep = peep - base_peep
-    if delta_peep > 0:
-        recruitment_factor = (ri_index - 0.5) * 0.1   # [ASSUMPTION] — Phase 1 will test this
-        return c_base * (1 + recruitment_factor * delta_peep)
+
+def compliance_response(c_base: float, dpeep: float) -> float:
+    """Point estimate of compliance after a PEEP change: UNCHANGED (best-supported by our data)."""
     return c_base
+
+
+def compliance_change_range(dpeep: float) -> Tuple[float, float]:
+    """The (low, high) fractional compliance change to expect across a PEEP step of `dpeep`."""
+    if dpeep > 0:
+        return RESPONSE_RANGE_PLACEHOLDER["up"]
+    if dpeep < 0:
+        return RESPONSE_RANGE_PLACEHOLDER["down"]
+    return (0.0, 0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -181,10 +262,11 @@ def predict(value: float, rr: float, peep: float, base_peep: float,
 
     mode == 'VC'  → `value` is the tidal volume (mL) you set; we predict the pressure.
     mode == 'PC'  → `value` is the inspiratory pressure (cmH2O) you set; we predict the volume.
-    `base_peep` is the patient's current PEEP, needed for the recruitment effect.
+    `base_peep` is the patient's current PEEP; if `peep` differs, the prediction also
+    carries the RANGE of what a PEEP step might do to compliance (§3).
     """
-    # §3 compliance at this PEEP (recruitment effect)
-    c_new = dynamic_compliance(mech.c_stat_base, pt.ri_index, peep, base_peep)
+    dpeep = peep - base_peep
+    c_new = compliance_response(mech.c_stat_base, dpeep)           # §3 point estimate: unchanged
 
     # §5 VC vs PC branching
     if mode == "VC":
@@ -194,14 +276,12 @@ def predict(value: float, rr: float, peep: float, base_peep: float,
         test_pinsp = value                       # we chose the pressure
         test_vt = (test_pinsp - peep) * c_new    # → predict the breath size
 
-    vt_l = test_vt / 1000.0
     pred_pplat = test_pinsp
     pred_driving_p = pred_pplat - peep
     pred_ppeak = pred_pplat + mech.resistive_gap
 
-    # §1 Mechanical Power. In VC we use peak pressure; in PC we use plateau.
-    pressure_term = pred_ppeak if mode == "VC" else pred_pplat
-    pred_mp = 0.098 * rr * vt_l * (pressure_term - 0.5 * pred_driving_p)
+    # §1 the three power numbers (same formulas in VC and PC; PC's resistive part is an approximation [ASSUMPTION])
+    power = mechanical_power(rr, test_vt, pred_ppeak, pred_pplat, peep)
 
     # §6 CO2 and pH
     valv_new = rr * (test_vt - mech.v_deadspace)
@@ -212,7 +292,20 @@ def predict(value: float, rr: float, peep: float, base_peep: float,
     tau = mech.r_aw * (c_new / 1000.0)
     te = (60.0 / rr) - 1.0
 
+    # §3 the range, if PEEP moved: what if compliance lands at the low or high end?
+    lo, hi = compliance_change_range(dpeep)
+    c_lo, c_hi = c_new * (1 + lo), c_new * (1 + hi)
+    if mode == "VC":
+        pplat_range = (peep + test_vt / c_hi, peep + test_vt / c_lo)        # stretchier lung → lower plateau
+        mp_tidal_range = (mp_tidal(rr, test_vt, pplat_range[0], peep), mp_tidal(rr, test_vt, pplat_range[1], peep))
+    else:
+        vt_lo, vt_hi = (test_pinsp - peep) * c_lo, (test_pinsp - peep) * c_hi
+        pplat_range = (test_pinsp, test_pinsp)                                # pressure is what we set
+        mp_tidal_range = (mp_tidal(rr, vt_lo, test_pinsp, peep), mp_tidal(rr, vt_hi, test_pinsp, peep))
+
     return Prediction(
-        mp=pred_mp, pplat=pred_pplat, driving_p=pred_driving_p, ppeak=pred_ppeak,
-        vt=test_vt, ph=pred_ph, paco2=pred_paco2, tau=tau, te=te,
+        mp=power["mp"], mp_dyn=power["mp_dyn"], mp_tidal=power["mp_tidal"], mp_formula=power["formula"],
+        pplat=pred_pplat, driving_p=pred_driving_p, ppeak=pred_ppeak,
+        vt=test_vt, ph=pred_ph, paco2=pred_paco2, tau=tau, te=te, compliance=c_new,
+        compliance_range=(lo, hi), pplat_range=pplat_range, mp_tidal_range=mp_tidal_range,
     )

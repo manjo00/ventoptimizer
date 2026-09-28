@@ -23,11 +23,12 @@ Static compliance  C = VT ÷ (Pplat − PEEP)        (mL per cmH₂O)
 - We assume compliance is **constant (linear)** across pressures. The ARDS pressure–volume curve is **not** linear — it has a lower and an upper inflection point `[N2]`, so compliance changes with pressure and recruitment.
 - **This is the model's biggest known weakness.** Track C will measure the error and replace "linear" with each patient's own P–V curve. (Research Agenda Q1.)
 
-## 3. Recruitment — does adding PEEP help or hurt?  `[concept cited N1; magnitude data-supported]`
-Uses the Recruitment-to-Inflation (R/I) index:
-- **R/I > 0.5 (recruitable):** raising PEEP opens collapsed lung → compliance improves → driving pressure and MP can *fall*.
-- **R/I < 0.5 (non-recruitable):** raising PEEP overstretches → compliance worsens → MP *rises*.
-- Current math: `C_new = C × (1 + (R/I − 0.5) × 0.1 × ΔPEEP)`. The **R/I concept and the 0.5 cut-off are cited** `[N1]` (Chen 2020). The `×0.1` magnitude is now **data-supported**: the demo shows a population recruitment slope **β ≈ 0.083/cmH₂O**, and a PEEP-aware correction cut plateau error **28%** on held-out patients (see `_Research_Log`). Confirm on full MIMIC-IV before changing the production model. **⚠ 2026-09-28 (step 1b, real plateaus only): the β≈0.083 / 28% result was an artifact of carried plateaus — retracted. Honest demo estimate: β = 0.026 /cmH₂O (bootstrap 95% −0.038 to +0.089, includes 0) and the correction gives no held-out gain. The `×0.1` is therefore an `[ASSUMPTION]` and probably too large on average; the real signal is individual (same-direction IQR −30% to +35%), not a population constant. See `_Research_Log`.**
+## 3. Recruitment — does adding PEEP help or hurt?  `[concept cited N1; NO validated magnitude — 2026-09-28]`
+The physiology: in a **recruitable** lung (R/I > 0.5 `[N1]`) raising PEEP opens collapsed units → compliance improves → driving pressure and tidal power can *fall*; in a **non-recruitable** lung it overstretches → compliance worsens → they *rise*. The direction is real; **the size is not predictable from routine data yet.**
+- **History:** the prototype used `C_new = C × (1 + (R/I − 0.5) × 0.1 × ΔPEEP)`; the demo then seemed to confirm a population slope β ≈ 0.083 and a 28% prediction gain — **both were artifacts of carried (forward-filled) plateaus and were retracted** (`_Research_Log` 2026-09-28, step 1b). On real measurements β = 0.026 with an interval including zero, and a patient's own previous step did not predict the next one either (step 2a).
+- **Current math (engine, 2026-09-28):** point estimate = **compliance unchanged** across a PEEP step (it beat every alternative on real data); every PEEP step carries a **range** — placeholder IQRs from the open demo (PEEP↑: −7% to +31%; PEEP↓: −30% to +35%; n = 27) until the full-MIMIC state model passes its pre-set criterion (`_Analysis_Plan_FullMIMIC.md`, H1). A measured R/I, if the maneuver was done, is shown as information only.
+- **Consequence for the optimizer:** PEEP is **not** searched; VT/rate are optimized at the current PEEP; PEEP gets the ceiling (§8), the range for each step, and the test-step protocol (option C).
+- 🟥 **Prediction only, never titration.** A compliance change with PEEP is *not* a recruitment measure, and titrating PEEP to "best compliance" increased mortality (ART trial, JAMA 2017). The optimizer must never raise PEEP just to chase compliance. See `_Literature_Validation.md` T7.
 - 🟥 **Use it for PREDICTION only.** A compliance change with PEEP is *not* a recruitment measure, and titrating PEEP to "best compliance" increased mortality (ART trial, JAMA 2017). The optimizer must keep minimizing MP within ARDSNet limits — never raise PEEP just to chase compliance. See `_Literature_Validation.md` T7.
 
 ## 4. Auto-PEEP / breath-stacking guard  `[STANDARD] [E5]`
@@ -74,9 +75,10 @@ ceiling                 the highest PEEP_new (≤ 24) with  Pplat ≤ 30 [E3],  
 
 ---
 
-## How these become the optimizer (see `engine/optimizer.py`)
-1. Build a grid of candidate settings (ranges of VT/Pinsp, RR, PEEP).
-2. For each: predict compliance (§2–3), pressures (§5), MP (§1), pH (§6), auto-PEEP (§4).
-3. **Reject** any that break a limit in `_Schema.md`.
-4. **Score** survivors = MP + a small penalty for drifting far from the patient's current settings.
-5. Return the lowest score, with a plain-language reason.
+## How these become the optimizer (see `engine/optimizer.py`, rewired 2026-09-28)
+1. Compute the **safe-PEEP ceiling** (§8) from the current state — with its vetoes and cautions.
+2. Build a grid of candidate settings (ranges of VT/Pinsp and RR) **at the current PEEP** — PEEP is held, because no validated model predicts the lung's response to a PEEP step (§3).
+3. For each: pressures (§5), the three power numbers (§1), pH (§6), auto-PEEP (§4).
+4. **Reject** any that break a limit in `_Schema.md`; flag driving pressure > 15.
+5. **Score** survivors = **tidal power** (§1) + a small penalty for drifting far from the current VT/rate. Return the lowest, with a plain-language reason that shows tidal power vs current, and both absolute forms labelled.
+6. **PEEP guidance:** for each step inside `[current PEEP, ceiling]`, show the **range** of compliance, plateau and tidal power (§3), then the **test-step protocol** (option C): smallest step → re-measure the plateau → keep if driving pressure fell or is unchanged (within the 2 cmH₂O noise) and SpO₂/MAP are acceptable → reverse if it rose, plateau > 30, MAP < 65, or SpO₂ fell. A ceiling is never a recommendation to go there.
