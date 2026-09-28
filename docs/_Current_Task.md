@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-28
 **Phase:** 1 (centered on the PEEP goal)
-**Status:** steps 1, 1b, 2a, 2b, **sub-problem 1 v1** and **the optimizer rewiring DONE** (2026-09-28) → **waiting on Ahmed's full-MIMIC run** (the decisive experiment) · next build task = re-port `app/ventoptimizer.html` from the engine (it still runs the retracted v2.4 logic)
+**Status:** steps 1, 1b, 2a, 2b, **sub-problem 1 v1**, **the optimizer rewiring** and **the web-app re-port DONE** (2026-09-28) → **waiting on Ahmed's full-MIMIC run** (the decisive experiment)
 
 ## The goal (see CLAUDE.md → THE CORE GOAL)
 The project can't proceed without solving PEEP, **math-only on pre-recorded data**:
@@ -24,7 +24,7 @@ Scope = a prototype on recorded datasets; live-patient testing is a possible fut
 ## Immediate next steps
 1. **Ahmed — the full-MIMIC run** (`_Analysis_Plan_FullMIMIC.md` §12): four scripts, paste the printed output (aggregates only), note the MIMIC-IV version + `git rev-parse --short HEAD`. Then apply the frozen decision rules (§10). H5 also replaces the 5%/cmH₂O margin in `safe_peep.py` with measured worst-case responses by PEEP level.
 2. ✅ **Ceiling wired into the optimizer (2026-09-28):** PEEP is held (no validated response model); VT/RR optimized at the current PEEP by **tidal power**; the PEEP-guidance block shows the ceiling with vetoes/cautions, the placeholder **range** for each step inside [current, ceiling], and the **test-step protocol** (option C). Three labelled power numbers everywhere; peak-only fallback when no plateau. Baseline limit violations are stated (a suggestion may use more power to restore pH — the example case does).
-3. **Re-port `app/ventoptimizer.html` from the engine** — it still runs the retracted v2.4 logic (R/I × 0.1 rule, PEEP search, absolute-MP score). Rule in CLAUDE.md: the web app only ships what the engine has proven. Until re-ported, do not demo it.
+3. ✅ **Web app re-ported (2026-09-28):** `app/ventoptimizer.html` mirrors the engine; `engine/check_web_port.py` proves it (Node vs Python, 4 cases, 0 differences). **Rule:** run that check after any change to the engine or the page.
 4. When the full run returns: replace `RESPONSE_RANGE_PLACEHOLDER` in `physiology.py` with the state-conditional quantiles (H1 met → the model's interval; H1 not met → the state-stratified Δ%C quantiles), and replace the 5%/cmH₂O margin in `safe_peep.py` with the H5 worst-case responses by PEEP level.
 5. Later: `safe_peep.py` v2 — patient-specific elastance ratio when a measured transpulmonary pressure exists (the 3% subset).
 
@@ -41,7 +41,7 @@ Scope = a prototype on recorded datasets; live-patient testing is a possible fut
 
 ## Noticed (not fixing now)
 1. ~~MP formula docs vs code mismatch~~ — **settled and implemented 2026-09-28** (`physiology.mechanical_power`: plateau form, surrogate fallback, both reported).
-6. `app/ventoptimizer.html` runs the old v2.4 logic — re-port (next step 3).
+6. ~~`app/ventoptimizer.html` runs the old v2.4 logic~~ — **re-ported 2026-09-28**; kept in sync by `check_web_port.py`.
 2. exp4/exp5 still run on carried-plateau snapshots; re-run on `pplat_fresh` rows for tidiness.
 3. `_Task_History.md` rows are not in date order — cosmetic.
 4. `_Data_Access.md` still names the "Temporal Dataset for Respiratory Support" as the download; the plan targets the MIMIC-IV clinical tables directly — reconcile when Ahmed confirms what he holds.

@@ -283,10 +283,14 @@ def predict(value: float, rr: float, peep: float, base_peep: float,
     # §1 the three power numbers (same formulas in VC and PC; PC's resistive part is an approximation [ASSUMPTION])
     power = mechanical_power(rr, test_vt, pred_ppeak, pred_pplat, peep)
 
-    # §6 CO2 and pH
+    # §6 CO2 and pH. A breath no bigger than the dead space clears no CO2 at all:
+    # treat that as "CO2 rises without limit" so the safety gates reject the setting.
     valv_new = rr * (test_vt - mech.v_deadspace)
-    pred_paco2 = (mech.base_valv * pt.base_paco2) / valv_new
-    pred_ph = 6.1 + math.log10(pt.hco3 / (0.03 * pred_paco2))
+    if valv_new <= 0:
+        pred_paco2, pred_ph = float("inf"), float("-inf")
+    else:
+        pred_paco2 = (mech.base_valv * pt.base_paco2) / valv_new
+        pred_ph = 6.1 + math.log10(pt.hco3 / (0.03 * pred_paco2))
 
     # §4 auto-PEEP / breath-stacking helpers
     tau = mech.r_aw * (c_new / 1000.0)
