@@ -8,7 +8,7 @@ Last refreshed: 2026-09-28 (after core-goal step 2b)
 - **To resume (any new session):** `Read CLAUDE.md, then docs/_Compact.md, then docs/_Current_Task.md, and continue from "Where we are / next".`
 
 ## 1. What this is
-**VentOptimizer** — a decision-support **prototype** (not a medical device) that recommends ventilator settings minimizing mechanical power within safety limits, for **all** ventilated patients (not ARDS-only). **Math-only, on pre-recorded data.** Python engine (`engine/`) = source of truth; `app/ventoptimizer.html` = front-end demo. Repo: `manjo00/ventoptimizer` (main). Owner: Ahmed (RT student, not a coder → teaching mode).
+**VentOptimizer** — a decision-support **prototype** (not a medical device) that recommends ventilator settings minimizing mechanical power within safety limits, for **all** ventilated patients (not ARDS-only). **Math-only, on pre-recorded data.** Python engine (`engine/`) = source of truth; `app/ventoptimizer.html` = front-end demo. Repo: `manjo00/ventoptimizer` (main). Owner: Ahmed (RT student, not a coder → teaching mode). Plain-language pitch for the team/supervisor: `docs/_Team_Brief.md` (refresh it when the state changes).
 
 ## 2. THE CORE GOAL (locked)
 Solve **PEEP** via math on recorded data: **(1) choose the highest SAFE PEEP** (recruit without overdistension); **(2) predict the PEEP→compliance change → compute the resulting mechanical power.** A dataset must carry every math input. Live-patient testing = possible future only.
