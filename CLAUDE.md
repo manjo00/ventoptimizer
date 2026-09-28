@@ -135,7 +135,7 @@ VentOptimizer/
 │   ├── _Required_Variables.md ← the PEEP-math input list + dataset coverage verdict
 │   ├── _Analysis_Plan_FullMIMIC.md ← the frozen full-MIMIC analysis plan (step 2b)
 │   └── _Compact.md        ← one-page state; read first after /compact
-├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · check_coverage.py · peep_response_pilot.py · state_predictor.py · README.md
+├── engine/                ← Python: physiology.py · optimizer.py · safe_peep.py · validate_mimic.py · check_coverage.py · peep_response_pilot.py · state_predictor.py · README.md
 ├── app/                   ← ventoptimizer.html (v2.4 prototype)
 ├── reference/             ← READ-ONLY source: Manuscript_V3.pdf, Research Poster.pdf, Mega-Prompt Context.md
 └── poster_day/            ← parked poster deliverables (unrelated to the engine)

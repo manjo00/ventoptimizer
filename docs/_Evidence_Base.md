@@ -10,12 +10,17 @@
 - Held across oxygenation, lung size, and age (ORs 1.08–1.10). `[M]`
 - **Implication:** no safe MP floor to "aim for" — lower is better all the way down, subject to safety limits. Objective = *minimize MP*, not *get under 17*.
 
-## The Mechanical Power equation  `[E1] = ref 6` · validated `[E2] = ref 7`
+## The Mechanical Power equation  `[E1] = ref 6` · validated `[E2] = ref 7` · surrogate `[N8]`
+Two forms exist and we use both, for different jobs (**decision 2026-09-28** — this resolves the docs-vs-code mismatch):
 ```
-MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
+(a) Gattinoni simplified (needs a plateau):  MP  (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Pplat − PEEP) ]
+                                             = 0.098 × RR × VT(L) × [ PEEP + (Ppeak − Pplat) + ½ΔP ]   (static + resistive + tidal-elastic)
+(b) peak-only surrogate (no plateau needed): MP_dyn (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]  = 0.098 × RR × VT(L) × ½(Ppeak + PEEP)
 ```
+- **Rule:** the engine (`physiology.py`, `validate_mimic.py`, `app/`) computes **(a)** whenever a plateau is charted — it is the validated simplified equation and the only form that yields the **tidal-elastic term we optimize** (`MP_tidal = 0.098 × RR × VT × ½ΔP`). When no plateau exists it falls back to **(b)**. **(b) is always reported alongside** because it is the manuscript's metric (`[M]`: OR 1.09 per J/min, harm below 17 J/min) and the metric of the largest database studies `[N8]`; the two must be labelled, never mixed in one comparison.
 - `[E1]` Gattinoni L, et al. Ventilator-related causes of lung injury: the mechanical power. Intensive Care Med 2016;42(10):1567–75.
-- `[E2]` Chiumello D, et al. Bedside calculation of mechanical power… Crit Care 2020;24:417. (Validated this surrogate; notes peak pressure adds a resistive component.)
+- `[E2]` Chiumello D, et al. Bedside calculation of mechanical power… Crit Care 2020;24:417. (Validated the simplified forms; notes peak pressure adds a resistive component.)
+- `[N8]` Serpa Neto A, et al. *Mechanical power of ventilation is associated with mortality in critically ill patients: an analysis of patients in two observational cohorts.* Intensive Care Med 2018;44:1914–22 — MIMIC-III + eICU (n = 8,207), peak-pressure form; OR per 5 J/min 1.06 / 1.10; risk rises consistently above **17 J/min**; harm persists even at low tidal volume. Q1. Strength: observational association.
 - Cohort MP range 0.24–109.6 J/min, mean 13.45. `[M]`
 
 ## Lung-protective safety limits
@@ -52,8 +57,17 @@ MP (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]
 
 ## PEEP-response predictors & the PEEP/FiO₂ tables  `[N6]` `[N7]` (added 2026-09-28 for the required-variable list)
 - `[N6]` Gattinoni L, et al. *Lung recruitment in patients with the acute respiratory distress syndrome.* NEJM 2006;354:1775–86. The recruitable lung fraction varied widely between patients (mean ≈13%) and **predicted the response to PEEP** (oxygenation, dead space, compliance). Used here only to justify **which recorded variables are candidate recruitability inputs** (baseline oxygenation, PaCO₂/dead space, compliance); no threshold taken from it. `[ASSUMPTION until re-checked in the Phase-1 literature pass: that the sicker-baseline ↔ more-recruitable direction holds outside CT-defined ARDS]`
-- `[N7]` Brower RG, et al. (ALVEOLI). *Higher versus lower PEEP in patients with ARDS.* NEJM 2004;351:327–36 — the empirical **higher-PEEP/FiO₂ table** (vs the ARDSNet 2000 lower-PEEP table `[E3]`); no mortality difference between tables. Role for us: the two tables bound the *conventional* PEEP range for a given FiO₂ — a sanity envelope, **not** a target.
-- **Hemodynamic guard for PEEP steps:** PEEP lowers venous return / raises right-ventricular afterload (standard physiology). Any numeric MAP / vasopressor threshold used as a guard is `[TO-CITE before use]` — do not put a number in code yet.
+- `[N7]` Brower RG, et al. (ALVEOLI). *Higher versus lower PEEP in patients with ARDS.* NEJM 2004;351:327–36 — the empirical **higher-PEEP/FiO₂ table** (vs the ARDSNet 2000 lower-PEEP table `[E3]`); no mortality difference between tables. Role for us: the two tables bound the *conventional* PEEP range for a given FiO₂ — a sanity envelope, **not** a target. **Table values (encoded in `engine/safe_peep.py`):** lower table FiO₂ 0.3→5 · 0.4→5–8 · 0.5→8–10 · 0.6→10 · 0.7→10–14 · 0.8→14 · 0.9→14–18 · 1.0→18–24; higher table 0.3→5–14 · 0.4→14–16 · 0.5→16–20 · 0.6–0.7→20 · 0.8→20–22 · 0.9→22 · 1.0→22–24. Goal in both: PaO₂ 55–80 mmHg or SpO₂ 88–95%.
+- **Hemodynamic guard for PEEP steps:** PEEP lowers venous return / raises right-ventricular afterload (standard physiology). Numeric guard now cited: `[N11]` below.
+
+## Highest-safe-PEEP ceilings, floors and gates  `[N9]` `[N10]` `[N11]` (sub-problem 1, 2026-09-28 — encoded in `engine/safe_peep.py`)
+- **Plateau ≤ 30 cmH₂O** `[E3]`; **airway driving pressure ≤ 15 cmH₂O** and **transpulmonary driving pressure ≤ 11.7 cmH₂O** — `[N9]` Chiumello D, et al. *Airway driving pressure and lung stress in ARDS patients.* Crit Care 2016;20:276 (150 sedated, paralysed ARDS patients at PEEP 5 and 15; ΔP > 15 and ΔP_L > 11.7 at PEEP 15 correlated with critical lung stress; ΔP tracks lung stress, chest-wall elastance can blur it). Q1. Strength: physiological cohort. The mortality weight of ΔP: `[E4]` Amato 2015 (RR 1.41 per ~7 cmH₂O; no hard threshold given there).
+- **Elastance-ratio estimate** ΔP_L ≈ ΔP × E_L/E_RS with E_L/E_RS ≈ **0.70** `[ASSUMPTION — population average; in Chiumello's cohort the implied ratio was ≈ 0.78 (11.7/15)]`. With 0.70, the ΔP ≤ 15 rule already implies ΔP_L ≤ 10.5, so the transpulmonary check only bites when a **measured** ΔP_L (esophageal balloon; MIMIC codes 224746/224747) is supplied.
+- **Raised intracranial pressure:** treat ICP **> 22 mmHg** — `[N10]` Carney N, et al. *Guidelines for the Management of Severe Traumatic Brain Injury, 4th ed.* (Brain Trauma Foundation) Neurosurgery 2017;80:6–15 (level II B). Our gate: no PEEP increase above 22; caution whenever ICP is monitored.
+- **Mean arterial pressure floor:** initial target **MAP ≥ 65 mmHg** — `[N11]` Evans L, et al. *Surviving Sepsis Campaign: International Guidelines 2021.* Crit Care Med 2021;49:e1063–e1143 (moderate-quality evidence). Our gate: no PEEP increase while MAP < 65; caution while a vasopressor runs.
+- **Oxygenation goal** SpO₂ 88–95% / PaO₂ 55–80 mmHg `[E3]` — used as *status*, never as a reason to override a ceiling.
+- **Cautious worst-case margin:** when projecting the plateau at a higher PEEP without a prediction model, compliance is assumed to be able to **fall 5% per cmH₂O of PEEP increase (capped at 50%)** — `[ASSUMPTION — from our own demo (step 1b): lower-quartile response ≈ −7% for a 3-cmH₂O step, worst cases ≈ −30%; to be replaced by the full-MIMIC H5 result]`.
+- **Chest tube present → caution (air leak)** `[ASSUMPTION — clinical convention]`; **auto-PEEP ≥ 1 cmH₂O measured → caution** (3τ rule `[E5]`); **spontaneous breaths or support mode → mechanics invalid** (standard: plateau needs a passive patient).
 
 ## Data source for validation  `[M]`
 - MIMIC-IV (v3.1) via the PhysioNet "Temporal Dataset for Respiratory Support" (v1.1.0). Credentialed; **local-only handling** (see `_Data_Access.md` + CLAUDE.md governance).
