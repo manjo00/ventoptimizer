@@ -36,9 +36,9 @@ try:
 except Exception:
     pass
 
-# Same plausibility filter the validation harness uses (so "183 PEEP changes" here
-# means the same thing as in validate_mimic.py).
-from validate_mimic import physiologic_filter
+# Shared with the validation harness (one definition each, so the two scripts never drift):
+# the plausibility filter, the sliced table reader, and the list of controlled ventilator modes.
+from validate_mimic import physiologic_filter, read_filtered, CONTROLLED_MODES
 
 # ---------------------------------------------------------------------------
 # THE REQUIRED-VARIABLE LIST (code form of docs/_Required_Variables.md)
@@ -108,21 +108,6 @@ MECH_IDS = [224685, 220339, 224696, 224695, 220210]          # the pivot columns
 MECH_NAMES = {224685: "vt", 220339: "peep", 224696: "pplat", 224695: "ppeak", 220210: "rr"}
 MODE_IDS = [223849, 229314]
 VENT_MARKER_IDS = [224685, 220339, 224696, 224695]           # "this stay was on a ventilator"
-
-# Ventilator-mode strings that mean CONTROLLED breaths (plateau/compliance valid).
-CONTROLLED_MODES = {"CMV/ASSIST/AutoFlow", "CMV/ASSIST", "CMV", "APV (cmv)", "P-CMV", "PCV+",
-                    "SIMV", "SIMV/PSV", "SIMV/AutoFlow", "SIMV/PSV/AutoFlow", "PRVC/AC", "PRVC/SIMV"}
-
-
-def read_filtered(path, usecols, keep_itemids, chunksize=2_000_000):
-    """Read a big MIMIC table in chunks, keeping only the item codes we care about.
-    (The full chartevents is hundreds of millions of rows — never load it whole.)"""
-    parts = []
-    for chunk in pd.read_csv(path, usecols=usecols, chunksize=chunksize, compression="gzip"):
-        parts.append(chunk[chunk["itemid"].isin(keep_itemids)])
-    if not parts:
-        return pd.DataFrame(columns=usecols)
-    return pd.concat(parts, ignore_index=True)
 
 
 def per_stay_stats(sub, vent_ids):

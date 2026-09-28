@@ -6,14 +6,14 @@ app in `app/` is just a demo face; this is what we trust and improve.)
 ## What you need (one-time)
 - **Python 3** installed. Check by opening a terminal and typing `python --version`.
 - Nothing else for the optimizer — it uses only built-in Python (no installs).
-- (Later, the MIMIC validation will need `pandas`; we'll install it when we get there.)
+- The two MIMIC scripts need `pandas` and `numpy` (one-time: `pip install pandas numpy`).
 
 ## The files
 | File | What it does (plain language) |
 |---|---|
 | `physiology.py` | The "what would happen if…" calculator. Predicts pressures, Mechanical Power, and pH for one setting. Does no choosing. |
 | `optimizer.py` | The chooser. Tries thousands of settings, drops unsafe ones, keeps the lowest-energy safe one, and explains why. |
-| `validate_mimic.py` | The accuracy checker (Phase 1). Replays real patients and compares predicted vs what actually happened. Currently a skeleton with fake demo data. |
+| `validate_mimic.py` | The accuracy checker (Phase 1). Replays real MIMIC-IV patients (aggregate output only) and runs the experiments: compliance stability, plateau prediction, recruitment across PEEP steps (the "1b" versions use only plateaus that were really measured, in a controlled mode), CO₂ prediction, and how much power the VT↔rate knob can save. Reads the big table in slices, so it works on the full data. Run: `python engine/validate_mimic.py --demo <MIMIC-IV folder>`. |
 | `check_coverage.py` | The dataset checker. Opens a MIMIC-IV folder and reports, for every variable the PEEP math needs, how often it is present — plus how many PEEP changes are usable. Prints aggregate counts only. Run: `python engine/check_coverage.py --mimic <folder>` (the list it checks is explained in `docs/_Required_Variables.md`). |
 
 ## How to run them
@@ -21,7 +21,8 @@ Open a terminal **in the project folder** and type:
 
 ```bash
 python engine/optimizer.py        # see a recommended setting for the example patient
-python engine/validate_mimic.py   # see the accuracy-check format (synthetic demo for now)
+python engine/validate_mimic.py --demo data/mimic-iv-clinical-database-demo-2.2   # the accuracy experiments (aggregate output)
+python engine/check_coverage.py --mimic data/mimic-iv-clinical-database-demo-2.2  # does the dataset carry every input we need?
 ```
 
 Each prints a plain-language result. If you see an error, copy the whole message
