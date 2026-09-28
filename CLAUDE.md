@@ -50,7 +50,7 @@ Commit again when the task is done:
 ```bash
 git add -A && git commit -m "feat/fix/docs: <task>"
 ```
-End commit messages with: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`
+End commit messages with: `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`
 
 **☁️ Backup to GitHub — push after EVERY task.** The remote `origin` is the main backup:
 `https://github.com/manjo00/ventoptimizer.git`. After each task's final commit, immediately:
@@ -73,14 +73,24 @@ When we validate against MIMIC (or any credentialed dataset):
 
 ## 📋 HOW A SESSION WORKS
 
-1. **Read `CLAUDE.md` + `docs/_Current_Task.md`.** That's usually all the context you need.
+1. **Read `CLAUDE.md` + `docs/_Compact.md` + `docs/_Current_Task.md`.** That's usually all the context you need. (`_Compact.md` = the whole project state on one page — **always read it first after a `/compact`, a resume, or a new session.**)
 2. **Challenge first.** If the request is ambiguous, contradicts the evidence base, or is unsafe — push back with one focused question before doing anything.
 3. **Restate** the task in ~2 sentences and **list the exact files** you'll touch.
 4. **Git checkpoint** (command above).
 5. **Write the task** into `docs/_Current_Task.md` using the template at the bottom of that file.
 6. **Do the work — and explain it** in plain language as you go (teaching mode).
 7. **Spotted an unrelated problem?** Note it under `## Noticed (not fixing now)` in `_Current_Task.md`. Don't fix it now.
-8. **When done, always:** append one line to `docs/_Task_History.md`, update any doc whose facts changed, `git commit`, then **`git push origin HEAD`** (back up to GitHub).
+8. **When done, always:** append one line to `docs/_Task_History.md`, **refresh `docs/_Compact.md`** (decisions, numbers, next steps, open items — keep it ≤ 1 page), update any doc whose facts changed, `git commit`, then **`git push origin HEAD`** (back up to GitHub).
+
+---
+
+## 🧠 COMPACT / RESUME PROTOCOL (so context is never lost)
+
+`docs/_Compact.md` is the **authoritative one-page state** of the project (goal, locked decisions, key numbers, next steps, open items, guardrails).
+- **Before a `/compact`:** make sure `_Compact.md` is current — anything important that lives only in the conversation must be written there (or in the relevant `docs/` file) *first*. Then commit + push.
+- **After a `/compact`, a resume, or a new session:** read `_Compact.md` **before doing anything**, then `_Current_Task.md`. If a specific detail is missing, the context-mode session memory (`ctx_search`, source `session-events`) and `docs/_Research_Log.md` hold the full record.
+- **At the end of every task:** refresh `_Compact.md` (step 8 above). It must never be stale — it is what survives compaction.
+- Ahmed's repeatable prompts are at the top of `_Compact.md`.
 
 ---
 
@@ -97,6 +107,7 @@ The whole point of this setup is to NOT re-read everything. Match the task to th
 | The MIMIC data field codes (itemids) | `docs/_Data_Dictionary.md` |
 | How pieces connect | `docs/_Architecture.md` |
 | What to do next / open questions | `docs/_Research_Agenda.md` + `Roadmap.md` |
+| Rebuilding context after `/compact` / a new session | `docs/_Compact.md` (then `_Current_Task.md`) |
 | The Python engine code | `engine/README.md`, then the one `.py` file named |
 | The web prototype | `app/ventoptimizer.html` |
 | Source material (manuscript, prototype) | `reference/` |
@@ -116,7 +127,8 @@ VentOptimizer/
 ├── docs/                  ← the Project Brain (modular context)
 │   ├── _Architecture.md   ├── _Clinical_Logic.md  ├── _Schema.md
 │   ├── _Evidence_Base.md  ├── _Research_Agenda.md
-│   ├── _Current_Task.md   └── _Task_History.md
+│   ├── _Current_Task.md   ├── _Task_History.md
+│   └── _Compact.md        ← one-page state; read first after /compact
 ├── engine/                ← Python: physiology.py · optimizer.py · validate_mimic.py · README.md
 ├── app/                   ← ventoptimizer.html (v2.4 prototype)
 ├── reference/             ← READ-ONLY source: Manuscript_V3.pdf, Research Poster.pdf, Mega-Prompt Context.md
