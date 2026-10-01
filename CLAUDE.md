@@ -3,9 +3,9 @@
 
 VentOptimizer recommends mechanical-ventilator settings (tidal volume, respiratory rate, PEEP, inspiratory pressure) that **minimize Mechanical Power** — the energy delivered to the lungs each minute — while staying inside hard safety limits, to reduce Ventilator-Induced Lung Injury (VILI). It is a **decision-support prototype, not a medical device.**
 
-It targets **all mechanically ventilated patients — not just ARDS.** Excess mechanical power harms the whole ventilated population (the manuscript's MP–mortality link held across every subgroup, none spared), so the tool and its validation are not ARDS-specific.
+It targets **all mechanically ventilated patients — not just ARDS.** Excess mechanical power harms the whole ventilated population (in the manuscript the point estimate exceeded 1 in all eight prespecified subgroups — and the signal was *weakest* in coded ARDS, so the non-ARDS majority carries it), so the tool and its validation are not ARDS-specific.
 
-The evidence that minimizing Mechanical Power is the right goal comes from Ahmed's own MIMIC-IV study: each +1 J/min of power raised the adjusted odds of 28-day death by ~9%, with risk rising steadily and **no safe threshold even below 17 J/min** (see `docs/_Evidence_Base.md`).
+The evidence that minimizing Mechanical Power is the right goal comes from Ahmed's team's MIMIC-IV study (ICM draft, Sep 2026; 19,801 patients): an interquartile-range rise in power (8.2 → 13.6 J/min) raised the adjusted odds of 28-day death by 52% (≈ +8% per J/min at the median), risk rose across the **whole** range with **no detectable breakpoint** (so 17–18 J/min is a point on a continuous curve, not a safe line), and **respiratory rate — not tidal volume — carried the signal** (see `docs/_Evidence_Base.md`; the superseded capstone numbers were OR 1.09 per J/min in 18,980 patients).
 
 ---
 
@@ -137,7 +137,7 @@ VentOptimizer/
 │   └── _Compact.md        ← one-page state; read first after /compact
 ├── engine/                ← Python: physiology.py · optimizer.py · safe_peep.py · validate_mimic.py · check_coverage.py · peep_response_pilot.py · state_predictor.py · check_web_port.py · README.md
 ├── app/                   ← ventoptimizer.html — mirrors the engine; run engine/check_web_port.py after ANY change to the engine or the page
-├── reference/             ← READ-ONLY source: Manuscript_V3.pdf, Research Poster.pdf, Mega-Prompt Context.md
+├── reference/             ← READ-ONLY source: Manuscript_V3.pdf (superseded capstone), Research Poster.pdf, Mega-Prompt Context.md — the current manuscript (ICM draft, Sep 2026) is deliberately NOT committed (public repo); its numbers live in docs/_Evidence_Base.md as [M]
 └── poster_day/            ← parked poster deliverables (unrelated to the engine)
 ```
 

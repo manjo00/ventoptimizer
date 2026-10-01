@@ -14,6 +14,11 @@ node_modules/
 Thumbs.db
 .DS_Store
 
+# Unpublished manuscript drafts — the repo is PUBLIC; a journal draft (pre-submission text,
+# author e-mails / phone) must never be pushed. Its numbers live in docs/_Evidence_Base.md as [M].
+reference/*draft*
+reference/*Draft*
+
 # Patient data — NEVER commit credentialed MIMIC/PhysioNet data (governance rule)
 data/
 mimic_data/

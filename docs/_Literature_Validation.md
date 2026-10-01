@@ -11,13 +11,13 @@ then large observational; then our own demo data (indicative, not proof).
 ## The claims register
 
 ### T1 — "Higher mechanical power → worse survival, so minimize it" (our north star)
-- **Evidence:** multiple large cohorts — Serpa Neto 2018 (MIMIC-III + eICU; OR ≈1.06 per 5 J/min), Urner 2020 (Lancet Respir Med), Azizi 2023, several MIMIC-IV analyses, **and Ahmed's own manuscript** (+9% odds of death per J/min). A 2023 systematic review/meta-analysis: lower MP → better survival.
+- **Evidence:** multiple large cohorts — Serpa Neto 2018 (MIMIC-III + eICU; OR ≈1.06 per 5 J/min), Urner 2020 (Lancet Respir Med), Azizi 2023, several MIMIC-IV analyses, **and the team's own manuscript `[M]`** (ICM draft Sep 2026: OR 1.52 per IQR 8.2 → 13.6 J/min, ≈ +8 % per J/min at the median; E-value 1.77 — the authors themselves say causal language is not warranted). A 2023 systematic review/meta-analysis, and Sato 2026 (Crit Care Med): lower MP → better survival.
 - **🟥 Caveat:** **No completed RCT proves that *lowering* MP saves lives.** Recent MP-guided trials are small / mixed / non-significant. The link is a strong *association* + plausible mechanism — not a proven intervention.
 - **Verdict:** 🟦 strong observational association. **The tool reflects best current evidence, not proven therapy.**
 
 ### T2 — "Risk is graded; no safe MP threshold (harm accrues even < 17 J/min)"
-- **Evidence:** Ahmed's manuscript (graded quartiles, harm below 17). Other studies cite a ~17–18 J/min danger zone.
-- **Verdict:** 🟦 supported; we sit at the "lower is better all the way down" end — defensible, a step ahead of the fixed-threshold camp.
+- **Evidence:** the team's manuscript `[M]` now tests this *formally*: restricted-cubic-spline dose–response (nonlinear p = 0.014, rising across the whole range, no plateau) and segmented regression with the Davies test (**no supported breakpoint**, p = 0.14); 75 % of the cohort sat at or below 13.6 J/min and risk rose through that range. Other studies cite a ~17–18 J/min danger zone (Serpa Neto `[N8]`, Manrique 2024); `[M]` reads those as points on a continuous curve. **Nuance `[M]`:** no *population* breakpoint ≠ no *individual* threshold (a porcine model shows a sharp structural limit at a mechanical-power ratio > 4.5); heterogeneity smooths individual limits into a graded curve — which fits our own "the response is individual" findings.
+- **Verdict:** 🟦 supported, now with a formal threshold test; we sit at the "lower is better all the way down" end — defensible. *(The earlier quartile-survival evidence 89 → 70 % `[M-v3]` is superseded.)*
 
 ### T3 — "The Gattinoni mechanical-power equation is a valid measure"
 - Gattinoni 2016 (concept); Chiumello 2020 (validated vs the gold-standard pressure–volume method).
@@ -62,7 +62,9 @@ then large observational; then our own demo data (indicative, not proof).
 
 ### T12 — "Favor low tidal volume, high rate" (the optimizer's bias)
 - MP weights VT quadratically, RR linearly. Costa 2021 (AJRCCM): **driving pressure's mortality impact is ~4× respiratory rate's**; the elastic-dynamic (driving-pressure) component dominates, and a simple driving-pressure + RR model ≈ full MP.
-- **Verdict:** 🟦 supported — cutting VT / driving pressure is the highest-value move; trading VT↓ for RR↑ reduces the dominant harm (RR isn't free, but smaller + auto-PEEP risk). → strongly consider making **driving pressure an explicit optimizer target** (with T5/Amato).
+- **Verdict (original):** 🟦 supported — cutting VT / driving pressure is the highest-value move; trading VT↓ for RR↑ reduces the dominant harm (RR isn't free, but smaller + auto-PEEP risk). → strongly consider making **driving pressure an explicit optimizer target** (with T5/Amato).
+- **⚠ Counterweight (2026-10-01, `[M]`):** in the team's own cohort, with the peak-only surrogate (no plateau), **rate carried 87 %** of the components' mortality signal (OR per SD 1.71), peak pressure 13 %, **tidal volume 0 %** (0.99) — and at equal high power, small-breath/high-rate configurations carried *higher* odds (2.03 vs 1.35). The manuscript reconciles the two: Costa answers "which component injures when full mechanics are known" (ΔP), `[M]` answers "which routine variable carries the signal when they are not" (rate). Its clinical reading: **don't cut VT and raise rate just to lower the number**; treat a high rate as a signal to find its cause; where rate is controlled, lower the rate rather than raise VT.
+- **Verdict (revised):** 🟦 the *driving-pressure* half stands (Amato, Costa — plateau-based); 🟨 the *"rate is cheap"* half is **contested by our own data** → the VT↔RR trade must not be presented as harm reduction until the objective is decided (`_Research_Agenda` Q6). Mitigations already in the engine: the 3τ air-trapping gate, the pH floor, the RR deviation penalty, and the demo finding that the savable VT↔RR power ≈ 0.
 
 ## ⚠️ Two honesty pillars (carry these into every claim and every output)
 1. **Association ≠ intervention.** Minimizing MP is strongly *associated* with survival but not RCT-*proven* to cause it. Frame the tool as evidence-based decision support, **not** proven treatment.

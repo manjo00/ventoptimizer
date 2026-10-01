@@ -1,6 +1,6 @@
 # _Compact.md — the whole project state on one page
 **Read this FIRST after any `/compact`, resume, or new session (then `_Current_Task.md`). Keep it ≤ ~1 page. Refresh it at the end of EVERY task (with `_Task_History.md`).**
-Last refreshed: 2026-09-28 (after sub-problem 1 v1)
+Last refreshed: 2026-10-01 (manuscript v2 — the ICM draft — absorbed; docs only, engine unchanged)
 
 ## 📋 Repeatable prompts (copy-paste)
 - **Before compacting (refresh the state):** `Refresh docs/_Compact.md with everything from this session, then commit + push.`
@@ -32,12 +32,13 @@ Solve **PEEP** via math on recorded data: **(1) choose the highest SAFE PEEP** (
 - **Per-patient pilot (2a):** spread = **3.2×** the noise floor (IQR −9 to +7) → response real; direction repeats **43%**, Spearman 0.09; own-last-step MAE 8.70 vs baseline 4.01.
 - **Safe-PEEP ceiling (sub-problem 1, 488 real controlled moments):** **32% vetoed** (MAP < 65: 70, effort 55, ΔP > 15: 39); where an increase is allowed, headroom **median 5 cmH₂O (IQR 2–6)**, **11% none**; binding limit **ΔP 50%**, plateau 38%, envelope 12%; cautions: vasopressor 38%, auto-PEEP 25%, chest tube 21%; charted PEEP within the ALVEOLI envelope 84%, below 16%, above 0%; SpO₂ above target 83%.
 - **Survives:** compliance varies **17.7%** within a patient; PEEP changes hardest to predict (MAE 4.19 vs VT-only 2.71 vs noise floor 1.41). MP savable by VT↔RR ≈ **0**. HB dead space worsened CO₂ prediction. Elastance ratio `(Pplat−PEEP)×0.7` = no-balloon stress.
-- Manuscript anchor: OR **1.09**/J·min; harm below 17 J/min (`[N8]` agrees). T1–T12 graded in `_Literature_Validation.md`.
+- **Manuscript anchor `[M]` (ICM draft 7 Sep 2026 — a re-analysis; absorbed 2026-10-01):** n 19,801; OR **1.52 per IQR** (8.2 → 13.6 J/min), **≈ 1.08 per J/min** at the median; nonlinear, **no breakpoint** (Davies p 0.14); OR > 1 in all 8 subgroups (weakest in coded ARDS); **rate carries 87 % of the component signal, VT 0 %**; E-value 1.77 (authors: causal language not warranted); PEEP not examinable (76 % at 5 cmH₂O). Old 1.09/J·min, 18,980, quartile survival = superseded `[M-v3]`. **The draft is NOT in the repo (public).** T1–T12 graded in `_Literature_Validation.md`.
 - Full MIMIC ≈ ×500 → ~10k usable pairs = the decisive run (`state_predictor.py` pipeline-tested; UNDERPOWERED on the demo by design).
 
 ## 5. Where we are / next
 - **Waiting on Ahmed's full-MIMIC run** (four scripts, plan §12) → apply the frozen decision rules (§10); H5 replaces the safe-PEEP margin.
 - **No build task is pending** — everything now waits on the full-MIMIC run. Optional polish meanwhile: exp4/exp5 on fresh plateaus; a cited air-leak criterion for the chest-tube caution.
+- **New open design question Q6 (from `[M]`, 2026-10-01):** rate is not free — in routine data the mortality signal sits in the respiratory rate, not tidal volume, and `[M]` warns against "cut VT, raise rate" as a way to lower the number. Should the VT↓/RR↑ trade be penalised, capped or re-framed? Ahmed decides (`_Research_Agenda` Q6); engine unchanged meanwhile (demo: savable VT↔RR power ≈ 0, so low stakes so far).
 - When the full run returns: replace `RESPONSE_RANGE_PLACEHOLDER` (`physiology.py`) with the state-conditional quantiles / model interval, and the 5%/cmH₂O margin (`safe_peep.py`) with the H5 worst-case responses by PEEP level. Later: `safe_peep.py` v2 (patient-specific elastance ratio in the transpulmonary subset).
 - Secondary: permissive-hypercapnia lever, driving pressure as explicit target (Costa: 4× RR), per-patient dead space.
 - Noticed, not fixed: exp4/exp5 on carried plateaus; `_Data_Access` download target; chest-tube caution is coarse (needs a cited air-leak criterion).
@@ -45,6 +46,7 @@ Solve **PEEP** via math on recorded data: **(1) choose the highest SAFE PEEP** (
 ## 6. Open with Ahmed
 - **Run the four scripts on full MIMIC-IV, paste the printed output** (aggregates only); MIMIC-IV version; who is credentialed.
 - Pick the paper-title angle (tidal-vs-absolute insight / individualized-PEEP method / no-balloon hook).
+- **Manuscript v2 (2026-10-01):** keep the ICM draft out of the public repo (or make the repo private); confirm the ICM numbers are final before quoting them anywhere; **decide Q6** (rate-aware objective?). The poster-day scripts still match the *printed* poster (old analysis) — say if the poster is being redone with the new numbers.
 - Folder rename `research poster day` → `VentOptimizer` (manual; cosmetic).
 
 ## 7. Guardrails (never)

@@ -1,14 +1,34 @@
 # Evidence Base — every clinical number, with a source
 
-**Rule:** if a number is used in code or docs, it must appear here with a citation. `[M]` = Ahmed's manuscript (`reference/Manuscript_V3.pdf`). External refs use the manuscript's numbers where possible; new refs added in Phase 1 are marked `[N#]`.
+**Rule:** if a number is used in code or docs, it must appear here with a citation. `[M]` = the team's manuscript — **current version = the ICM submission draft of 7 Sep 2026** (*Dynamic Mechanical Power and Mortality in Mechanically Ventilated Adults: A Continuous Risk Without a Safe Threshold*; Alahmadi, Alamodi, Alzahrani, Alshehri, Althobiani, Al-Otaibi), **held by Ahmed and deliberately NOT committed** (the repo is public; the draft is unpublished and carries author contact details; `.gitignore` blocks `reference/*draft*`). `[M-v3]` = the superseded capstone version (`reference/Manuscript_V3.pdf`, May 2026 — the poster was built on it). External refs use the manuscript's numbers where possible; new refs added in Phase 1 are marked `[N#]`.
 
 ---
 
 ## Why we minimize Mechanical Power (the whole premise)  `[M]`
-- In 18,980 ventilated MIMIC-IV adults, each **+1 J/min** of time-weighted MP raised the **adjusted odds of 28-day death by ~9%** (OR 1.09, 95% CI 1.09–1.10). `[M]`
-- Risk is **graded, not threshold** — 28-day survival fell stepwise across MP quartiles (~89% → 86% → 83% → **70%**), and **every quartile boundary sat below 17 J/min**, so harm accrues even in the "acceptable" range. `[M]`
-- Held across oxygenation, lung size, and age (ORs 1.08–1.10). `[M]`
-- **Implication:** no safe MP floor to "aim for" — lower is better all the way down, subject to safety limits. Objective = *minimize MP*, not *get under 17*.
+**Updated 2026-10-01 to the ICM draft (7 Sep 2026) — a re-analysis of the same data (R, restricted cubic splines, segmented regression), not an edit. The capstone numbers `[M-v3]` in the table below are superseded.**
+- **Cohort:** 19,801 adults on procedure-confirmed invasive ventilation (of 50,920 MIMIC-IV ICU stays; 20,674 confirmed ventilated; 873 excluded for having no hour with all four inputs recorded together; ≥ 1 computable hour required — the old 4-hour floor is now only a sensitivity analysis). **3,546 (17.9%) died within 28 days** of the first ventilated hour. `[M]`
+- **Dose–response:** an interquartile-range rise in time-weighted power (**8.2 → 13.6 J/min**) raised the adjusted odds of 28-day death by **52%** (OR 1.52, 95% CI 1.41–1.64); at the cohort median (10.3 J/min) each **+1 J/min ≈ +8%** odds (OR 1.08, 1.07–1.10). Adjusted for age, sex, PBW, SOFA at T₀ and the Elixhauser–van Walraven index (deliberately *not* oxygenation or driving pressure — causal-pathway variables). `[M]`
+- **No safe threshold, formally tested:** the curve is nonlinear (p = 0.014), **rises across the whole exposure range with no plateau**, and segmented regression found **no supported breakpoint** (Davies p = 0.14). So the published 17–18 J/min limits `[N8]` are points on a continuous curve, not biological lines. The manuscript's own reading: absence of a detectable *population* breakpoint, not proof that no *individual* threshold exists (individual limits are smoothed out by heterogeneity). `[M]`
+- **Subgroups:** OR per IQR > 1 in all eight prespecified subgroups; the CI crossed 1 only in coded ARDS (1.13, 0.83–1.54) and pneumonia (1.17, 0.99–1.38); gradient across worsening oxygenation 1.55 (P/F ≥ 300) → 3.93 (< 100), interaction p = 0.153. `[M]`
+- **Robustness:** Fine–Gray competing-risk sHR 1.49; excluding deaths < 24 h OR 1.44; requiring ≥ 4 computable hours OR 1.35 (1.23–1.48). **E-value 1.77** (1.66 for the CI bound) — a confounder of that strength would explain the result away, so the authors state *causal language is not warranted*. C-statistic 0.77. `[M]`
+- **Strength:** 🟦 single-centre observational association (journal submission, not yet peer-reviewed). **Implication for the tool (unchanged in direction):** no MP floor to "aim for" — minimise overall, within the safety limits; objective = *minimize MP*, not *get under 17*. **New from `[M]`:** minimisation must not be achieved by raising VT past protective limits, nor by cutting VT while raising rate "so the number falls without injurious exposure falling with it" — see the next section.
+
+| superseded `[M-v3]` (capstone, May 2026) | current `[M]` (ICM draft, Sep 2026) |
+|---|---|
+| n = 18,980; 3,428 deaths (18.1%); ≥ 4 h of data required | n = 19,801; 3,546 deaths (17.9%); ≥ 1 computable hour |
+| OR 1.09 per +1 J/min (1.09–1.10), linear model | OR 1.52 per IQR 8.2 → 13.6 (1.41–1.64); ≈ 1.08 per J/min at the median; spline, nonlinear p = 0.014 |
+| covariates: age, sex, PBW, P/F, phenotype flags, vasopressors, CRRT (SOFA dropped) | covariates: age, sex, PBW, SOFA at T₀, Elixhauser–van Walraven |
+| 28-day survival by MP quartile 89 → 86 → 83 → 70 %; "every quartile boundary < 17 J/min" | no quartile analysis; segmented regression → no breakpoint (Davies p = 0.14) |
+| 3 subgroup splits (oxygenation, lung size, age), ORs 1.08–1.10 | 8 prespecified subgroups, all OR > 1; plus component decomposition (RR 87 %, Ppeak 13 %, VT 0 %) |
+| SQL Server + SPSS | R 4.6.0 (rms, tidycmprsk, segmented) |
+
+## Which component carries the harm — rate, not volume (routine data)  `[M]` — added 2026-10-01
+- In a mutually adjusted model (each component per 1 SD; PEEP excluded because **76 % of the cohort received exactly 5 cmH₂O**): **respiratory rate OR 1.71** (1.64–1.78), **peak airway pressure 1.23** (1.18–1.28), **tidal volume per PBW 0.99** (0.93–1.05). Rate = **87 %** of the joint drop-one χ², peak 13 %, VT **0 %**. Holds after adding pH/PaCO₂ (rate 1.57) and with the clinician-*set* rate instead of the delivered rate (rate 1.55; still 83 %). `[M]`
+- **Same power, different risk (cross-classification):** at high power, reaching it with *small* breaths (and so a higher rate) carried OR 2.03 vs 1.35 with larger breaths; high peak pressure 1.90 vs 1.65. `[M]`
+- **The manuscript's clinical reading (in substance):** there is no number to stay beneath, so the goal is minimisation proportionate to vulnerability; power reduction *fails both ways* — raising VT beyond protective limits to lower the number, or cutting VT while raising rate so the number falls without injurious exposure falling with it. Keep VT within protective limits; treat an elevated rate as a **signal to find its cause** (agitation, sedation, acidosis, asynchrony), not a value to lower directly; where rate is controlled, reducing it rather than raising VT remains reasonable, noting the permissive-hypercapnia trade-off. The null VT estimate is model-conditional and range-restricted and **does not override** the low-VT RCT evidence `[E3]`.
+- **Reconciliation with Costa `[N5]` (ΔP ≈ 4× rate):** adjacent questions — Costa had measured plateaus (full mechanics); `[M]` used the peak surrogate, so part of the elastic signal was absorbed by peak pressure and rate. Strength: 🟦 observational, single centre.
+- **What this means for the engine (open — Ahmed's call, `_Research_Agenda` Q6):** the optimizer trades VT↓ for RR↑ inside a tidal-power score with only a small per-breath penalty; `[M]` says rate is not free. On the demo the savable VT↔RR power was ≈ 0, so the stakes have been low in practice — but the rule needs deciding before any claim is made.
+- **PEEP:** `[M]` could not examine PEEP (76 % at 5 cmH₂O). The PEEP goal rests on `[E3][N7][N9][N10][N11]`, not on `[M]`; expect PEEP steps to be uncommon in MIMIC-IV's first 24 h.
 
 ## The Mechanical Power equation  `[E1] = ref 6` · validated `[E2] = ref 7` · surrogate `[N8]`
 Two forms exist and we use both, for different jobs (**decision 2026-09-28** — this resolves the docs-vs-code mismatch):
@@ -17,16 +37,16 @@ Two forms exist and we use both, for different jobs (**decision 2026-09-28** —
                                              = 0.098 × RR × VT(L) × [ PEEP + (Ppeak − Pplat) + ½ΔP ]   (static + resistive + tidal-elastic)
 (b) peak-only surrogate (no plateau needed): MP_dyn (J/min) = 0.098 × RR × VT(L) × [ Ppeak − ½(Ppeak − PEEP) ]  = 0.098 × RR × VT(L) × ½(Ppeak + PEEP)
 ```
-- **Rule:** the engine (`physiology.py`, `validate_mimic.py`, `app/`) computes **(a)** whenever a plateau is charted — it is the validated simplified equation and the only form that yields the **tidal-elastic term we optimize** (`MP_tidal = 0.098 × RR × VT × ½ΔP`). When no plateau exists it falls back to **(b)**. **(b) is always reported alongside** because it is the manuscript's metric (`[M]`: OR 1.09 per J/min, harm below 17 J/min) and the metric of the largest database studies `[N8]`; the two must be labelled, never mixed in one comparison.
+- **Rule:** the engine (`physiology.py`, `validate_mimic.py`, `app/`) computes **(a)** whenever a plateau is charted — it is the validated simplified equation and the only form that yields the **tidal-elastic term we optimize** (`MP_tidal = 0.098 × RR × VT × ½ΔP`). When no plateau exists it falls back to **(b)**. **(b) is always reported alongside** because it is the manuscript's metric (`[M]`: OR 1.52 per IQR, ≈ 1.08 per J/min at the median, no breakpoint) and the metric of the largest database studies `[N8]`; the two must be labelled, never mixed in one comparison.
 - `[E1]` Gattinoni L, et al. Ventilator-related causes of lung injury: the mechanical power. Intensive Care Med 2016;42(10):1567–75.
 - `[E2]` Chiumello D, et al. Bedside calculation of mechanical power… Crit Care 2020;24:417. (Validated the simplified forms; notes peak pressure adds a resistive component.)
 - `[N8]` Serpa Neto A, et al. *Mechanical power of ventilation is associated with mortality in critically ill patients: an analysis of patients in two observational cohorts.* Intensive Care Med 2018;44:1914–22 — MIMIC-III + eICU (n = 8,207), peak-pressure form; OR per 5 J/min 1.06 / 1.10; risk rises consistently above **17 J/min**; harm persists even at low tidal volume. Q1. Strength: observational association.
-- Cohort MP range 0.24–109.6 J/min, mean 13.45. `[M]`
+- Cohort time-weighted MP: median **10.3 J/min (IQR 8.2–13.6)**; spline knots at the 10th/50th/90th percentiles = 6.7 / 10.3 / 18.8 J/min; non-survivors 12.2 vs survivors 10.0. `[M]` *(the `[M-v3]` range 0.24–109.6, mean 13.45, is superseded.)*
 
 ## Lung-protective safety limits
 - **Plateau ≤ 30 cmH₂O** and **VT 4–8 mL/kg PBW** — `[E3] = ref 3` Brower RG, et al. (ARDS Network). NEJM 2000;342:1301–8 (6 mL/kg, Pplat cap 30; mortality 39.8%→31.0%).
 - **Driving pressure (Pplat − PEEP)** is the ventilator variable most tied to mortality — `[E4] = ref 4` Amato MBP, et al. NEJM 2015;372:747–55. **Decision:** keep MP as the primary objective; evaluate adding driving pressure as a co-monitor/limit in Track C (with data), not bolt it on blindly.
-- **Reinforced `[N5]`:** Costa EL, et al. *Ventilatory variables and mechanical power in ARDS.* AJRCCM 2021;204:303–11 — driving pressure's mortality impact is ~**4× respiratory rate's**, and a driving-pressure + RR model ≈ full MP. Supports our low-VT/high-RR bias and makes driving pressure a strong explicit-target candidate. See `_Literature_Validation` T12.
+- **Reinforced `[N5]`:** Costa EL, et al. *Ventilatory variables and mechanical power in ARDS.* AJRCCM 2021;204:303–11 — driving pressure's mortality impact is ~**4× respiratory rate's**, and a driving-pressure + RR model ≈ full MP. Supports our low-VT/high-RR bias and makes driving pressure a strong explicit-target candidate. See `_Literature_Validation` T12. **⚠ Counterweight `[M]` (2026-10-01):** with the peak-only surrogate and no plateau, *respiratory rate* carried **87 %** of the components' joint signal (OR per SD 1.71), peak pressure 13 % (1.23) and tidal volume **none** (0.99) — the manuscript reads the two as adjacent questions (Costa: which component injures when full mechanics are known; `[M]`: which routine variable carries the signal when they are not). See "rate, not volume" above and `_Research_Agenda` Q6.
 
 ## Recruitment-to-Inflation (R/I) index  `[N1]` — concept & 0.5 threshold now CITED
 - `[N1]` Chen L, Del Sorbo L, Grieco DL, et al. *Potential for Lung Recruitment Estimated by the Recruitment-to-Inflation Ratio in ARDS. A Clinical Trial.* Am J Respir Crit Care Med 2020;201(2):178–187.
@@ -71,7 +91,8 @@ Two forms exist and we use both, for different jobs (**decision 2026-09-28** —
 
 ## Data source for validation  `[M]`
 - MIMIC-IV (v3.1) via the PhysioNet "Temporal Dataset for Respiratory Support" (v1.1.0). Credentialed; **local-only handling** (see `_Data_Access.md` + CLAUDE.md governance).
+- `[M]` cohort mechanics worth copying in our own scripts: T₀ = first hour of **procedure-confirmed** invasive ventilation (procedureevents itemid 225792), not inferred from settings; outcome = death ≤ 28 d from T₀ including post-discharge deaths (state records); SpO₂/FiO₂ substituted for PaO₂/FiO₂ in SOFA `[E7]`; PBW from height, missing in 23.4 % → sex-specific cohort median (single imputation, flagged as understating uncertainty).
 
 ---
 ### Legend
-`[M]` manuscript · `[E#]` external ref (manuscript numbering) · `[N#]` new Phase-1 ref · `[ASSUMPTION]` our guess, flagged · resolved tags moved from `[TO-RESEARCH]` → cited above.
+`[M]` manuscript (ICM draft, 7 Sep 2026 — not in the repo) · `[M-v3]` superseded capstone version (`reference/Manuscript_V3.pdf`) · `[E#]` external ref (manuscript numbering) · `[N#]` new Phase-1 ref · `[ASSUMPTION]` our guess, flagged · resolved tags moved from `[TO-RESEARCH]` → cited above.

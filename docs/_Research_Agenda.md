@@ -43,6 +43,14 @@
 ### Q5 — Permissive-hypercapnia floor citation
 - Document the real source for pH 7.30 / 7.20 cutoffs (currently uncited).
 
+### Q6 — Does the VT↓ / RR↑ trade lower *harm*, or just the number?  `[new 2026-10-01 — from the ICM manuscript [M]]`
+- **What the engine does now:** at the held PEEP it grid-searches VT 350–480 mL × RR 15–30 and keeps the safe setting with the lowest **tidal power** (`0.098 × RR × VT × ½ΔP`, ∝ RR × VT²/C) plus a small "don't stray" penalty (0.5 per breath/min of RR change, 0.01 per mL of VT change). Gates: plateau ≤ 30, VT 4–8 mL/kg, the pH floor, expiratory time ≥ 3τ. Because tidal power is quadratic in VT and only linear in RR, at a fixed CO₂ target the score prefers **smaller breaths at a higher rate**.
+- **What `[M]` found:** in routine data the mortality signal sits in the **rate** (87 % of the components' contribution; OR per SD 1.71), tidal volume contributes **none** inside the protective range, and at the same high power the small-breath/high-rate configuration carried *higher* odds than the larger-breath one (2.03 vs 1.35). Its warning: cutting VT while raising rate can make the number fall "without injurious exposure falling with it".
+- **Why this is not yet a contradiction:** `[M]` used the peak surrogate without plateaus (rate absorbs elastic signal); Costa `[N5]` with plateaus found ΔP ≈ 4× rate; our objective is the tidal (ΔP) power, not the surrogate. And on the demo the power savable by VT↔RR was ≈ 0 — the engine rarely moves far along this axis.
+- **Options (Ahmed decides; engine unchanged until then):** (i) keep the score, add the `[M]` caution to the explanation text whenever the suggestion raises RR; (ii) raise the RR deviation penalty or cap the suggested RR increase (e.g. never raise the rate in order to push VT below 6 mL/kg — the ARDSNet target, not just the 4 mL/kg floor); (iii) a two-term score (tidal power + a cited per-breath rate term) once a citation gives the weight; (iv) prefer lowering RR over raising VT when both lower tidal power (the permissive-hypercapnia trade-off applies).
+- **Test (full MIMIC, aggregate only):** among controlled-mode hours at similar *tidal* power, does 28-day mortality differ between high-RR/low-VT and low-RR/high-VT configurations after adjustment? That is `[M]`'s cross-classification restricted to our metric.
+- **PEEP note from `[M]`:** 76 % of the cohort received exactly 5 cmH₂O in the first 24 h → early PEEP steps are uncommon; keep the full-MIMIC pair-count expectations modest (the ~10k-pair estimate came from the demo's 27 pairs in 67 stays, which already reflects this).
+
 ---
 
 ## ⭐ The PEEP problem — the genuinely hard core (Ahmed's insight, 2026-06-20)
