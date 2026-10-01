@@ -46,7 +46,7 @@ Solve **PEEP** via math on recorded data: **(1) choose the highest SAFE PEEP** (
 ## 6. Open with Ahmed
 - **Run the four scripts on full MIMIC-IV, paste the printed output** (aggregates only); MIMIC-IV version; who is credentialed.
 - Pick the paper-title angle (tidal-vs-absolute insight / individualized-PEEP method / no-balloon hook).
-- **Manuscript v2 (2026-10-01):** keep the ICM draft out of the public repo (or make the repo private); confirm the ICM numbers are final before quoting them anywhere; **decide Q6** (rate-aware objective?). The poster-day scripts still match the *printed* poster (old analysis) — say if the poster is being redone with the new numbers.
+- **Manuscript v2 (2026-10-01):** keep the ICM draft out of the public repo (or make the repo private); confirm the ICM numbers are final before quoting them anywhere; **decide Q6** (rate-aware objective?). **The poster is NOT being redone (Ahmed, 2026-10-01)** → the poster-day scripts stay on the `[M-v3]` numbers on purpose; on stage quote only the poster's numbers.
 - Folder rename `research poster day` → `VentOptimizer` (manual; cosmetic).
 
 ## 7. Guardrails (never)

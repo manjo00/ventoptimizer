@@ -53,7 +53,7 @@ Scope = a prototype on recorded datasets; live-patient testing is a possible fut
 4. `_Data_Access.md` still names the "Temporal Dataset for Respiratory Support" as the download; the plan targets the MIMIC-IV clinical tables directly — reconcile when Ahmed confirms what he holds.
 5. `safe_peep.py` validation treats every chest tube as a possible air leak (104 moments) — many are post-operative drains; a finer rule needs a cited criterion.
 7. `optimizer.py:160` and `app/ventoptimizer.html:368` warn "> 17 J/min, the level where risk rises `[N8]`" — still correctly cited to Serpa Neto, but `[M]` now says there is no breakpoint; the wording could add "and our own data show risk rising below it" (cosmetic; touch both copies together and re-run `check_web_port.py`).
-8. `poster_day/` scripts quote the superseded `[M-v3]` numbers on purpose — they match the printed poster. Rewrite only if the poster is re-presented with the ICM analysis.
+8. `poster_day/` scripts quote the superseded `[M-v3]` numbers on purpose — they match the printed poster. **Ahmed confirmed 2026-10-01 that the poster is not being redone → leave the scripts alone;** the presenter must quote the poster's numbers, never the ICM draft's, and if asked about a newer analysis say only that the journal version was refined with the same conclusion.
 
 ## Secondary (after PEEP)
 - Permissive-hypercapnia MP lever (+ manual practitioner pH/CO₂ limit), driving pressure as target, per-patient dead space.
@@ -61,4 +61,4 @@ Scope = a prototype on recorded datasets; live-patient testing is a possible fut
 ## Open with Ahmed
 - **Run the four scripts on full MIMIC-IV and paste the output** (aggregates only). Which MIMIC-IV version do you hold, and who is credentialed?
 - Pick the paper-title angle; folder rename (cosmetic).
-- **Manuscript v2 (2026-10-01):** (a) keep the ICM draft out of the public repo — or make the repo private; (b) are the ICM numbers final (the file says "draft")? (c) **decide Q6** — should the optimizer stop trading VT↓ for RR↑ as if rate were free? (d) is the poster being redone with the new numbers?
+- **Manuscript v2 (2026-10-01):** (a) keep the ICM draft out of the public repo — or make the repo private; (b) are the ICM numbers final (the file says "draft")? (c) **decide Q6** — should the optimizer stop trading VT↓ for RR↑ as if rate were free? ~~(d) is the poster being redone?~~ **Answered 2026-10-01: no** — the poster-day scripts stay as they are.
