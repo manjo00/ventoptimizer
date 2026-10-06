@@ -156,3 +156,28 @@ In-hospital death (`admissions.hospital_expire_flag`), date of death (`patients.
 python engine/check_coverage.py --mimic <path to MIMIC-IV folder with icu/ and hosp/> --csv coverage_full.csv
 ```
 Reads the big tables in chunks (safe on the full data; expect tens of minutes). Paste the **whole printed output**. If the script prints "mode strings not yet classified", paste those too so the controlled-mode list can be extended.
+
+---
+
+## 7. Second datasets — eICU and AmsterdamUMCdb (check written 2026-10-06, not yet run on real data)
+**Why:** a second dataset answers the single-centre criticism (eICU: 208 US hospitals) and may carry denser plateau readings for the PEEP-response work (AmsterdamUMCdb). The same rule applies: *confirm coverage before committing*. The check is `engine/check_coverage_other.py`; it keeps the tier list above and adds a **label audit** because these databases name variables by text, not codes.
+```bash
+python engine/check_coverage_other.py --dataset eicu      --path <eICU folder>          --csv coverage_eicu.csv
+python engine/check_coverage_other.py --dataset amsterdam --path <AmsterdamUMCdb folder> --csv coverage_ams.csv
+# add --quick first: reads only the first slices (minutes, not hours) to see whether the label translation works
+```
+**What we expect, from the published data dictionaries (to be replaced by the printed output):**
+
+| | eICU (PhysioNet, same credential as MIMIC) | AmsterdamUMCdb (free application, separate) |
+|---|---|---|
+| Where the mechanics live | `respiratoryCharting` (text labels: "Plateau Pressure", "PEEP", "Peak Insp. Pressure", "Tidal Volume Observed (VT)", "Total RR", "Mode"); labels vary by hospital | `numericitems` (Dutch/English item names: "Plateau druk", "PEEP (Set)", "Piek druk", "Exp. tidal volume", "Ademfreq."); mode in `listitems` |
+| Plateau pressure | charted at some hospitals only — **the likely weak point** | high-frequency ventilator export — likely dense |
+| Gases | `lab` (paO2, paCO2, pH, HCO3, lactate) | `numericitems` (pO2, pCO2, pH, HCO3) |
+| SpO₂ / MAP / CVP / ICP | `vitalPeriodic` every 5 min (146 M rows — the slow table) | `numericitems` (monitor items) |
+| Vasopressors / NMB | `infusionDrug` drug names | `drugitems` item names |
+| Ventilation episodes | `respiratoryCare` start/end + treatment strings | `processitems` ("Beademen") |
+| Height / sex / age | `patient` (height in cm; age "> 89") | `admissions` — **10-cm height BANDS** → PBW ±5 cm `[flag]` |
+| Mortality | hospital discharge status only → **in-hospital death within 28 d; no post-discharge deaths** | `dateofdeath` recorded → true 28-day mortality |
+| Size / run time | ~200 k stays; tens of minutes | ~23 k admissions but ~1 billion `numericitems` rows → **hours** (use `--quick` first) |
+
+**Known limits of the check itself:** the translation tables were written without seeing the data (no download possible in the cloud session) — the label audit exists so the first real run corrects them; the controlled-mode classification is by keyword (SIMV counted as controlled, as in MIMIC) and the printed MODES table must be reviewed; the script was tested only on invented fixture folders that copy each database's file layout.

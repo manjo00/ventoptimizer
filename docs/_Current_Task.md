@@ -10,6 +10,13 @@
 **What changed in the evidence:** n 18,980 → **19,801**; OR 1.09 per J/min → **1.52 per IQR (8.2 → 13.6 J/min)**, ≈ 1.08 per J/min at the median; spline + segmented regression → **no breakpoint** (Davies p 0.14) and the quartile-survival result is gone; covariates now SOFA + Elixhauser; 8 subgroups, all OR > 1 (weakest in coded ARDS); **respiratory rate carries 87 % of the component signal, tidal volume 0 %**; E-value 1.77; PEEP not examinable (76 % at 5 cmH₂O).
 **What did NOT change:** the MP equation (same peak-only surrogate, so every `[M][N8]` code comment stays valid); the safety limits (all cited elsewhere); the engine, the web app and the poster-day scripts (the printed poster is the old analysis).
 
+## 2026-10-06 — Coverage check for a second dataset (eICU / AmsterdamUMCdb)
+**Task:** Ahmed asked for a dataset check for eICU and AmsterdamUMCdb, the two open ICU databases closest to MIMIC-IV, so a second dataset can be judged *before* anyone downloads it (CLAUDE.md rule: every input the math needs, confirmed first).
+**Files touched:** `engine/check_coverage_other.py` (new), `engine/README.md`, `docs/_Required_Variables.md` §7, this file, `_Task_History`, `_Compact`, `_Research_Log`.
+**How it works (plain words):** both databases store the same physiology under different names, so the script translates each database's labels into our variable names with small regular-expression tables, then runs the same checks as the MIMIC script (per-variable coverage in ventilated stays, usable PEEP-step pairs, ventilator modes) and prints a *label audit* so a missed label can be added after the first real run. Aggregate output only.
+**Tested on:** invented fixture folders copying each file layout (no real data reachable from the cloud session) — both paths and `--quick` run end to end. **Not yet run on real data.**
+**Caveats printed by the script:** eICU knows deaths only to hospital discharge; AmsterdamUMCdb gives height as 10-cm bands; the controlled-mode keyword rule must be reviewed against the printed MODES table.
+
 ## The goal (see CLAUDE.md → THE CORE GOAL)
 The project can't proceed without solving PEEP, **math-only on pre-recorded data**:
 1. **Choose the highest SAFE PEEP** — recruit/open the lung without over-stretching it. ✅ **v1 built** (`engine/safe_peep.py`).
@@ -61,4 +68,4 @@ Scope = a prototype on recorded datasets; live-patient testing is a possible fut
 ## Open with Ahmed
 - **Run the four scripts on full MIMIC-IV and paste the output** (aggregates only). Which MIMIC-IV version do you hold, and who is credentialed?
 - Pick the paper-title angle; folder rename (cosmetic).
-- **Manuscript v2 (2026-10-01):** (a) keep the ICM draft out of the public repo — or make the repo private; (b) are the ICM numbers final (the file says "draft")? (c) **decide Q6** — should the optimizer stop trading VT↓ for RR↑ as if rate were free? ~~(d) is the poster being redone?~~ **Answered 2026-10-01: no** — the poster-day scripts stay as they are.
+- **Manuscript v2 (2026-10-01):** (a) keep the ICM draft out of the public repo — or make the repo private; (b) are the ICM numbers final (the file says "draft")? (c) **decide Q6** — should the optimizer stop trading VT↓ for RR↑ as if rate were free? ~~(d) is the poster being redone?~~ **Answered 2026-10-01: no** — the poster-day scripts stay as they are. (e) **Second dataset (2026-10-06):** if eICU is wanted, sign its PhysioNet agreement (same credential), download, run `check_coverage_other.py --dataset eicu --quick` first, then the full run, and paste the printed output including the LABEL AUDIT and MODES tables.
