@@ -1,0 +1,25 @@
+# graphify: map only the code, which is free (python -m graphify update .).
+# Documents, images and data would cost tokens or add noise; the handover files cover them.
+docs/
+*.md
+*.txt
+*.pdf
+*.docx
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.svg
+*.json
+*.csv
+*.xlsx
+*.lock
+*.yaml
+*.yml
+node_modules/
+build/
+dist/
+reference/
+poster_day/
+data/

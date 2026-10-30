@@ -19,3 +19,5 @@ data/
 mimic_data/
 *.parquet
 *.csv.gz
+graphify-out/*
+!graphify-out/GRAPH_REPORT.md
