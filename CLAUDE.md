@@ -181,6 +181,8 @@ Manager" is his chat on the PC that keeps those rules. Either way, follow at lea
   for the key fact, or "guess". Past twice the estimate, stop and ask him. When ideas, plans or designs are being
   shaped, use the brainstorming skill if you have it, taking the parts that fit. For anything he judges by eye, show
   2-3 looks first and build the one he picks.
+- **Honest sizes:** small means under 30 minutes, medium half an hour to two hours, big anything longer. A fix to code
+  already open in the chat is 5–15 minutes, plus about 5 for each small new file; never pad (Ahmed, 2026-11-10).
 - **Research says its cost first:** before looking things up, say the time and the rough usage. Try your own searches
   first; start helper agents only if he says yes.
 - **Honest:** never say something works unless you checked it; say what the tests proved and what only his eyes can
